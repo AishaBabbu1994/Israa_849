@@ -343,15 +343,60 @@
     <script>
         // MAPEO DIRECTO: Letra Árabe → Pronunciación Hispanizada
         const PRONUNCIACION = {
-            'ب': 'b', 'ت': 't', 'ث': 'z', 'ج': 'y', 'ح': 'j',
-            'خ': 'j', 'د': 'd', 'ذ': 'd', 'ر': 'r', 'ز': 'z',
-            'س': 's', 'ش': 'ch', 'ص': 's', 'ض': 'd', 'ط': 't',
-            'ظ': 'z', 'ع': "'", 'غ': 'g', 'ف': 'f', 'ق': 'c',
-            'ك': 'c', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h',
-            'و': 'u', 'ي': 'i',
-            'ا': 'a', 'أ': 'a', 'إ': 'i', 'آ': 'aa', 'ى': 'a',
-            'َ': 'a', 'ُ': 'u', 'ِ': 'i', 'ً': 'an', 'ٌ': 'un',
-            'ٍ': 'in', 'ّ': '', 'ْ': '', 'ء': "'", ' ': ' '
+            // Consonantes básicas
+            'ب': 'b', 
+            'ت': 't', 
+            'ث': 'z', 
+            'ج': 'y', 
+            'ح': 'j',
+            'خ': 'j', 
+            'د': 'd', 
+            'ذ': 'd', 
+            'ر': 'r', 
+            'ز': 'z',
+            'س': 's', 
+            'ش': 'ch', 
+            'ص': 's', 
+            'ض': 'd', 
+            'ط': 't',
+            'ظ': 'z', 
+            'ع': "'", 
+            'غ': 'g', 
+            'ف': 'f', 
+            'ق': 'c',
+            'ك': 'c', 
+            'ل': 'l', 
+            'م': 'm', 
+            'ن': 'n', 
+            'ه': 'h',
+            'و': 'u', 
+            'ي': 'i',
+            
+            // Alif variantes
+            'ا': 'a', 
+            'أ': 'a', 
+            'إ': 'i', 
+            'آ': 'aa', 
+            'ى': 'a',
+            
+            // Ta Marbuta - LETRA MUY IMPORTANTE (femenino)
+            'ة': 't',
+            
+            // Hamza
+            'ء': "'",
+            
+            // Vocales y diacríticos
+            'َ': 'a', 
+            'ُ': 'u', 
+            'ِ': 'i', 
+            'ً': 'an', 
+            'ٌ': 'un',
+            'ٍ': 'in', 
+            'ّ': '', 
+            'ْ': '', 
+            
+            // Espacio
+            ' ': ' '
         };
 
         const LETRAS = [
@@ -381,7 +426,8 @@
             { arab: 'ن', nombre: 'nun', hispano: 'n' },
             { arab: 'ه', nombre: 'ha', hispano: 'h' },
             { arab: 'و', nombre: 'waw', hispano: 'u' },
-            { arab: 'ي', nombre: 'ya', hispano: 'i' }
+            { arab: 'ي', nombre: 'ya', hispano: 'i' },
+            { arab: 'ة', nombre: 'ta marbuta', hispano: 't (femenino)' }
         ];
 
         const VOCALES = [
@@ -406,6 +452,22 @@
             let resultado = '';
             for (let i = 0; i < texto.length; i++) {
                 const char = texto[i];
+                const siguiente = i < texto.length - 1 ? texto[i + 1] : '';
+                
+                // Si es una diacrítica que se combina con vocales largas
+                if (char === 'َ' && siguiente === 'ا') {
+                    resultado += 'aa';
+                    continue;
+                }
+                if (char === 'ِ' && siguiente === 'ي') {
+                    resultado += 'ii';
+                    continue;
+                }
+                if (char === 'ُ' && siguiente === 'و') {
+                    resultado += 'uu';
+                    continue;
+                }
+                
                 resultado += PRONUNCIACION[char] || char;
             }
             return resultado.trim();
