@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor Árabe a Buckwalter</title>
+    <title>Transliterador Árabe - Sistema Qamus</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
             background: #f5f5f5;
@@ -15,6 +15,20 @@
         h1 {
             color: #333;
             text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
         textarea {
             width: 100%;
@@ -25,6 +39,13 @@
             border-radius: 5px;
             resize: vertical;
             box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
         }
         button {
             background: #007bff;
@@ -34,78 +55,254 @@
             font-size: 16px;
             border-radius: 5px;
             cursor: pointer;
-            margin: 10px 0;
+            transition: background 0.3s;
         }
         button:hover {
             background: #0056b3;
         }
+        button.secondary {
+            background: #6c757d;
+        }
+        button.secondary:hover {
+            background: #545b62;
+        }
+        button.success {
+            background: #28a745;
+        }
+        button.success:hover {
+            background: #218838;
+        }
         #resultado {
-            background: white;
+            background: #f8f9fa;
             padding: 15px;
             border: 2px solid #ddd;
             border-radius: 5px;
             min-height: 100px;
             white-space: pre-wrap;
             word-wrap: break-word;
-            font-family: monospace;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
         }
         .label {
             font-weight: bold;
-            margin-top: 20px;
+            margin-top: 15px;
+            margin-bottom: 8px;
             color: #333;
+        }
+        .checkbox-group {
+            margin: 15px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .checkbox-group label {
+            display: block;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+        .info {
+            background: #e7f3ff;
+            padding: 10px;
+            border-left: 4px solid #2196F3;
+            margin: 15px 0;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <h1>Conversor de Árabe a Buckwalter</h1>
+    <h1>🔤 Transliterador Árabe</h1>
+    <p class="subtitle">Sistema de Transliteración Qamus.org</p>
     
-    <div class="label">Texto en árabe:</div>
-    <textarea id="texto-arabe" placeholder="Escribe o pega tu texto en árabe aquí..."></textarea>
-    
-    <button onclick="procesar()">Convertir a Buckwalter</button>
-    <button onclick="limpiar()" style="background: #6c757d;">Limpiar</button>
-    
-    <div class="label">Resultado:</div>
-    <div id="resultado">El resultado aparecerá aquí...</div>
+    <div class="container">
+        <div class="info">
+            <strong>Sistema Qamus:</strong> Convierte texto árabe a transliteración ASCII y viceversa. 
+            Incluye todos los caracteres árabes estándar y extendidos (Peh, Tcheh, Veh, Gaf).
+        </div>
+
+        <div class="checkbox-group">
+            <label>
+                <input type="checkbox" id="xml-friendly"> 
+                Usar formato XML-friendly (reemplaza < con I, > con O, & con W)
+            </label>
+        </div>
+
+        <div class="label">Texto en árabe:</div>
+        <textarea id="texto-arabe" placeholder="اكتب النص العربي هنا..."></textarea>
+        
+        <div class="button-group">
+            <button onclick="arabeATransliteracion()">➡️ Árabe a Transliteración</button>
+            <button onclick="transliteracionAARabe()">⬅️ Transliteración a Árabe</button>
+            <button onclick="limpiar()" class="secondary">🗑️ Limpiar</button>
+        </div>
+        
+        <div class="label">Resultado:</div>
+        <div id="resultado">El resultado aparecerá aquí...</div>
+        
+        <div class="button-group">
+            <button onclick="copiarResultado()" class="success">📋 Copiar Resultado</button>
+        </div>
+    </div>
 
     <script>
-        // Mapeo de caracteres árabes a Buckwalter
-        const buckwalter = {
-            '\u0628': 'b', '\u0630': '*', '\u0637': 'T', '\u0645': 'm',
-            '\u062a': 't', '\u0631': 'r', '\u0638': 'Z', '\u0646': 'n',
-            '\u062b': '^', '\u0632': 'z', '\u0639': 'E', '\u0647': 'h',
-            '\u062c': 'j', '\u0633': 's', '\u063a': 'g', '\u062d': 'H',
-            '\u0642': 'q', '\u0641': 'f', '\u062e': 'x', '\u0635': 'S',
-            '\u0634': '$', '\u062f': 'd', '\u0636': 'D', '\u0643': 'k',
-            '\u0623': '>', '\u0621': "'", '\u0626': '}', '\u0624': '&',
-            '\u0625': '<', '\u0622': '|', '\u0627': 'A', '\u0649': 'Y',
-            '\u0629': 'p', '\u064a': 'y', '\u0644': 'l', '\u0648': 'w',
-            '\u064b': 'F', '\u064c': 'N', '\u064d': 'K', '\u064e': 'a',
-            '\u064f': 'u', '\u0650': 'i', '\u0651': '~', '\u0652': 'o'
+        // Sistema de transliteración completo de Qamus.org
+        const transliterationMap = {
+            // Hamza y variantes de Alef
+            '\u0621': "'",  // HAMZA
+            '\u0622': '|',  // ALEF WITH MADDA ABOVE
+            '\u0623': '>',  // ALEF WITH HAMZA ABOVE
+            '\u0624': '&',  // WAW WITH HAMZA ABOVE
+            '\u0625': '<',  // ALEF WITH HAMZA BELOW
+            '\u0626': '}',  // YEH WITH HAMZA ABOVE
+            
+            // Consonantes básicas
+            '\u0627': 'A',  // ALEF
+            '\u0628': 'b',  // BEH
+            '\u0629': 'p',  // TEH MARBUTA
+            '\u062A': 't',  // TEH
+            '\u062B': 'v',  // THEH
+            '\u062C': 'j',  // JEEM
+            '\u062D': 'H',  // HAH
+            '\u062E': 'x',  // KHAH
+            '\u062F': 'd',  // DAL
+            '\u0630': '*',  // THAL
+            '\u0631': 'r',  // REH
+            '\u0632': 'z',  // ZAIN
+            '\u0633': 's',  // SEEN
+            '\u0634': '$',  // SHEEN
+            '\u0635': 'S',  // SAD
+            '\u0636': 'D',  // DAD
+            '\u0637': 'T',  // TAH
+            '\u0638': 'Z',  // ZAH
+            '\u0639': 'E',  // AIN
+            '\u063A': 'g',  // GHAIN
+            
+            // Tatweel
+            '\u0640': '_',  // TATWEEL
+            
+            // Más consonantes
+            '\u0641': 'f',  // FEH
+            '\u0642': 'q',  // QAF
+            '\u0643': 'k',  // KAF
+            '\u0644': 'l',  // LAM
+            '\u0645': 'm',  // MEEM
+            '\u0646': 'n',  // NOON
+            '\u0647': 'h',  // HEH
+            '\u0648': 'w',  // WAW
+            '\u0649': 'Y',  // ALEF MAKSURA
+            '\u064A': 'y',  // YEH
+            
+            // Diacríticos (vocales)
+            '\u064B': 'F',  // FATHATAN
+            '\u064C': 'N',  // DAMMATAN
+            '\u064D': 'K',  // KASRATAN
+            '\u064E': 'a',  // FATHA
+            '\u064F': 'u',  // DAMMA
+            '\u0650': 'i',  // KASRA
+            '\u0651': '~',  // SHADDA
+            '\u0652': 'o',  // SUKUN
+            
+            // Caracteres extendidos
+            '\u0670': '`',  // SUPERSCRIPT ALEF
+            '\u0671': '{',  // ALEF WASLA
+            '\u067E': 'P',  // PEH (Persa)
+            '\u0686': 'J',  // TCHEH (Persa)
+            '\u06A4': 'V',  // VEH (Persa)
+            '\u06AF': 'G'   // GAF (Persa/Urdu)
         };
 
-        function arabicToBuckwalter(word) {
-            let result = '';
-            for (let letter of word) {
-                result += buckwalter[letter] || letter;
-            }
-            return result;
+        // Mapa inverso (transliteración a árabe)
+        const reverseMap = {};
+        for (let arabic in transliterationMap) {
+            let trans = transliterationMap[arabic];
+            reverseMap[trans] = arabic;
         }
 
-        function procesar() {
+        // Versiones XML-friendly
+        const xmlFriendlyMap = {
+            '<': 'I',  // hamza-under-alef
+            '>': 'O',  // hamza-over-alef
+            '&': 'W'   // hamza-on-waw
+        };
+
+        const reverseXmlFriendlyMap = {
+            'I': '<',
+            'O': '>',
+            'W': '&'
+        };
+
+        function arabeATransliteracion() {
             const texto = document.getElementById('texto-arabe').value;
+            const xmlFriendly = document.getElementById('xml-friendly').checked;
+            
             if (!texto.trim()) {
                 document.getElementById('resultado').textContent = 'Por favor, escribe algo en árabe.';
                 return;
             }
             
-            const resultado = arabicToBuckwalter(texto);
+            let resultado = '';
+            for (let char of texto) {
+                if (transliterationMap[char]) {
+                    let trans = transliterationMap[char];
+                    
+                    // Aplicar formato XML-friendly si está activado
+                    if (xmlFriendly && xmlFriendlyMap[trans]) {
+                        trans = xmlFriendlyMap[trans];
+                    }
+                    
+                    resultado += trans;
+                } else {
+                    resultado += char;
+                }
+            }
+            
+            document.getElementById('resultado').textContent = resultado;
+        }
+
+        function transliteracionAARabe() {
+            const texto = document.getElementById('texto-arabe').value;
+            const xmlFriendly = document.getElementById('xml-friendly').checked;
+            
+            if (!texto.trim()) {
+                document.getElementById('resultado').textContent = 'Por favor, escribe la transliteración.';
+                return;
+            }
+            
+            let resultado = '';
+            let textoProcesado = texto;
+            
+            // Si está en modo XML-friendly, convertir primero
+            if (xmlFriendly) {
+                for (let char of textoProcesado) {
+                    if (reverseXmlFriendlyMap[char]) {
+                        textoProcesado = textoProcesado.replace(char, reverseXmlFriendlyMap[char]);
+                    }
+                }
+            }
+            
+            // Convertir transliteración a árabe
+            for (let char of textoProcesado) {
+                if (reverseMap[char]) {
+                    resultado += reverseMap[char];
+                } else {
+                    resultado += char;
+                }
+            }
+            
             document.getElementById('resultado').textContent = resultado;
         }
 
         function limpiar() {
             document.getElementById('texto-arabe').value = '';
             document.getElementById('resultado').textContent = 'El resultado aparecerá aquí...';
+        }
+
+        function copiarResultado() {
+            const resultado = document.getElementById('resultado').textContent;
+            navigator.clipboard.writeText(resultado).then(() => {
+                alert('✅ Resultado copiado al portapapeles');
+            }).catch(() => {
+                alert('❌ Error al copiar. Selecciona el texto manualmente.');
+            });
         }
     </script>
 </body>
