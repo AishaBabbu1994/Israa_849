@@ -110,6 +110,11 @@
         button:active {
             transform: translateY(0);
         }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
         .btn-transliterate { background-color: #2980b9; }
         .btn-transliterate:hover { background-color: #3498db; }
         .btn-diacritics { background-color: #27ae60; }
@@ -137,6 +142,27 @@
             color: #2c3e50;
             line-height: 1.6;
         }
+        .init-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        .init-message {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            font-size: 1.5em;
+            color: #2c3e50;
+        }
         @media (max-width: 768px) {
             .container { padding: 20px; }
             h1 { font-size: 1.8em; }
@@ -149,7 +175,13 @@
 </head>
 <body>
 
-<div class="container">
+<div id="initOverlay" class="init-overlay">
+    <div class="init-message">
+        <p>👆 Haz clic en cualquier parte para iniciar</p>
+    </div>
+</div>
+
+<div class="container" style="display:none;" id="mainContainer">
     <h1>Herramienta de Transliteración Árabe</h1>
     <p class="subtitle">Convierte texto árabe a script latino con alta precisión, gestiona diacríticos y escucha la pronunciación.</p>
     
@@ -168,7 +200,7 @@
         <button class="btn-transliterate" onclick="transliterate()">Transliterar</button>
         <button class="btn-diacritics" onclick="addDiacritics()">Añadir Diacríticos</button>
         <button class="btn-remove" onclick="removeDiacritics()">Eliminar Diacríticos</button>
-        <button class="btn-listen" onclick="listen()">🔊 Escuchar</button>
+        <button class="btn-listen" id="listenBtn" onclick="listen()">🔊 Escuchar</button>
     </div>
     
     <div class="status" id="status"></div>
@@ -180,6 +212,28 @@
 </div>
 
 <script>
+    // Inicialización con interacción del usuario
+    let audioInitialized = false;
+    let audioContext = null;
+
+    document.getElementById('initOverlay').addEventListener('click', function() {
+        this.style.display = 'none';
+        document.getElementById('mainContainer').style.display = 'block';
+        initAudio();
+        showStatus('¡Aplicación lista! Ingresa texto árabe y presiona "Transliterar"');
+    });
+
+    function initAudio() {
+        try {
+            // Crear un contexto de audio para desbloquear el audio
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            audioInitialized = true;
+            document.getElementById('listenBtn').disabled = false;
+        } catch (e) {
+            console.warn('Audio context no soportado:', e);
+        }
+    }
+
     // Mapeo exhaustivo de Árabe a Latino basado en estándares ALA-LC e ISO
     const transliterationMap = {
         'ا': 'ā', 'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j', 'ح': 'ḥ', 'خ': 'kh',
@@ -249,13 +303,13 @@
             }
         }
         document.getElementById('arabicInput').value = output;
-        showStatus('¡Diacríticos básicos añadidos! (NLP completo requiere backend)');
+        showStatus('¡Diacríticos básicos añadidos!');
     }
 
     function isArabicConsonant(char) {
         const code = char.charCodeAt(0);
-        // Consonantes árabes, excluyendo Alif, Waw, Ya que pueden ser vocales
-        return (code >= 0x0621 && code <= 0x064A) && code !== 0x0627 && code !== 0x0648 && code !== 0x064A;
+        // Consonantes árabes básicas
+        return (code >= 0x0628 && code <= 0x064A) && code !== 0x0648 && code !== 0x064A;
     }
 
     function isDiacritic(char) {
@@ -269,21 +323,72 @@
             showStatus('Por favor, introduce texto para escuchar.');
             return;
         }
-        // Usar API de Google Translate TTS
-        const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=ar&client=tw-ob`;
-        const audio = new Audio(url);
-        audio.play().then(() => {
-            showStatus('Reproduciendo audio...');
-        }).catch(() => {
-            showStatus('Reproducción bloqueada. Por favor, interactúa con la página primero.');
-        });
+
+        if (!audioInitialized) {
+            initAudio();
+        }
+
+        try {
+            // Usar Speech Synthesis API en lugar de Google Translate
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ar-SA';
+                utterance.rate = 0.9;
+                
+                utterance.onstart = function() {
+                    showStatus('Reproduciendo audio...');
+                };
+                
+                utterance.onend = function() {
+                    showStatus('Reproducción completada');
+                };
+                
+                utterance.onerror = function(e) {
+                    console.error('Error de síntesis de voz:', e);
+                    // Fallback a Google Translate si falla
+                    fallbackListen(text);
+                };
+                
+                speechSynthesis.speak(utterance);
+            } else {
+                fallbackListen(text);
+            }
+        } catch (e) {
+            console.error('Error al reproducir:', e);
+            fallbackListen(text);
+        }
+    }
+
+    function fallbackListen(text) {
+        try {
+            const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=ar&client=tw-ob`;
+            const audio = new Audio(url);
+            audio.play().then(() => {
+                showStatus('Reproduciendo audio...');
+            }).catch(err => {
+                console.error('Error de audio:', err);
+                showStatus('No se puede reproducir el audio. Verifica tu conexión.');
+            });
+        } catch (e) {
+            showStatus('Error al reproducir audio');
+        }
     }
 
     function showStatus(msg) {
         const status = document.getElementById('status');
         status.textContent = msg;
-        setTimeout(() => { status.textContent = ''; }, 4000);
+        setTimeout(() => { 
+            if (status.textContent === msg) {
+                status.textContent = ''; 
+            }
+        }, 4000);
     }
+
+    // Prevenir errores no manejados
+    window.onerror = function(msg, url, line) {
+        console.error('Error:', msg, 'en línea:', line);
+        return false;
+    };
 </script>
 
 </body>
