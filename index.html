@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Comparador de Fonemas Árabe–Español</title>
+  <title>Árabe → IPA → Español</title>
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -33,6 +33,7 @@
       padding: 1.5rem;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
       border: 1px solid #3b3f5c;
+      margin-bottom: 1.5rem;
     }
 
     label {
@@ -41,9 +42,8 @@
       font-weight: 600;
     }
 
-    textarea {
+    textarea, input {
       width: 100%;
-      min-height: 80px;
       border-radius: 8px;
       border: 1px solid #3b3f5c;
       padding: 0.75rem;
@@ -111,33 +111,84 @@
       font-size: 0.9rem;
       color: #ffd6ff;
     }
+
+    .ipa-output {
+      margin-top: 0.8rem;
+      font-family: "Courier New", monospace;
+      font-size: 1rem;
+      color: #ffb3ff;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Comparador de Fonemas Árabe–Español</h1>
-    <p style="text-align:center;">Escribe tu frase en IPA usando tus fonemas y mira la comparación con sonidos del español.</p>
+    <h1>Árabe → IPA → Español</h1>
+    <p style="text-align:center;">Escribe una frase en árabe y mira su IPA con comparación a sonidos del español.</p>
 
     <div class="card">
-      <label for="ipaInput">Frase en IPA (solo con tus fonemas):</label>
-      <textarea id="ipaInput" placeholder="/ʔuktub fi daktar/"></textarea>
+      <label for="arabicInput">Frase en árabe:</label>
+      <input id="arabicInput" dir="rtl" placeholder="اكتب في الدفتر">
       <div class="hint">
-        Usa solo estos fonemas: 
-        <span class="example">a, u, b, t, ʔ, ð, sˤ, m, ʕ, d, f, θ, j, n, i, q, h, z, w, r, iː, k, ʃ, ðˤ</span>
+        Ejemplo: <span class="example">اكتب في الدفتر</span>
       </div>
-      <button onclick="analyzeIPA()">Analizar frase</button>
+      <button onclick="convertArabicToIPA()">Convertir a IPA y analizar</button>
+
+      <div id="ipaResult" class="ipa-output"></div>
     </div>
 
-    <h2>Resultado</h2>
+    <h2>Comparación fonema por fonema</h2>
     <div id="result"></div>
 
     <div class="footer">
-      Hecho con cariño lingüístico ✨<br>
-      Puedes usarlo en GitHub Pages como tu mini laboratorio de fonética.
+      Herramienta casera de fonética ✨<br>
+      Súbela a GitHub Pages y úsala como tu laboratorio de árabe.
     </div>
   </div>
 
   <script>
+    // Mapa muy simplificado de letras árabes → fonemas IPA (solo tus fonemas)
+    // OJO: es aproximado y limitado, pensado para practicar, no para uso académico estricto.
+    const arabicToIPA = {
+      "ا": "ʔa",   // inicio de vocal
+      "أ": "ʔa",
+      "إ": "ʔi",
+      "آ": "ʔa",
+      "ء": "ʔ",
+      "ب": "b",
+      "ت": "t",
+      "ث": "θ",
+      "ج": "j",
+      "ح": "h",
+      "خ": "h",   // usando h para fricativa fuerte
+      "د": "d",
+      "ذ": "ð",
+      "ر": "r",
+      "ز": "z",
+      "س": "sˤ",  // usando tu sˤ como s general
+      "ش": "ʃ",
+      "ص": "sˤ",
+      "ض": "ðˤ",
+      "ط": "t",
+      "ظ": "ðˤ",
+      "ع": "ʕ",
+      "غ": "ʕ",   // aproximación
+      "ف": "f",
+      "ق": "q",
+      "ك": "k",
+      "ل": "l",   // no está en tu inventario, lo marcamos aparte
+      "م": "m",
+      "ن": "n",
+      "ه": "h",
+      "و": "w",
+      "ي": "j",
+      "ى": "a",
+      "َ": "a",
+      "ِ": "i",
+      "ُ": "u",
+      "ْ": "",
+      "ّ": ""     // no tratamos geminación aquí
+    };
+
     // Diccionario de fonemas → aproximación en español
     const phonemeMap = {
       "a": {
@@ -154,7 +205,7 @@
       },
       "iː": {
         ejemplo: "i larga",
-        desc: "Como la i de «vino» pero sostenida más tiempo (el español no alarga vocales)."
+        desc: "Como la i de «vino» pero sostenida más tiempo."
       },
       "b": {
         ejemplo: "b de «barco»",
@@ -162,7 +213,7 @@
       },
       "t": {
         ejemplo: "t de «taco»",
-        desc: "Oclusiva sorda, un poco más seca y sin tanta aspiración que en español."
+        desc: "Oclusiva sorda, más seca que la t española."
       },
       "d": {
         ejemplo: "d de «dado»",
@@ -214,15 +265,15 @@
       },
       "ʔ": {
         ejemplo: "corte en «¡eh!»",
-        desc: "Oclusiva glotal; pequeño golpe de cierre en la garganta, ausente en español estándar."
+        desc: "Oclusiva glotal; pequeño golpe de cierre en la garganta."
       },
       "ʕ": {
         ejemplo: "no existe en español",
-        desc: "Aproximante faríngea sonora; sonido gutural profundo, sin equivalente directo."
+        desc: "Aproximante faríngea sonora; sonido gutural profundo."
       },
       "q": {
         ejemplo: "k muy profunda",
-        desc: "Oclusiva uvular sorda; como una k hecha más atrás en la garganta."
+        desc: "Oclusiva uvular sorda; como una k hecha más atrás."
       },
       "h": {
         ejemplo: "j suave de «México»",
@@ -230,28 +281,45 @@
       },
       "sˤ": {
         ejemplo: "s enfática",
-        desc: "S alveolar enfática; más oscura y profunda, sin equivalente exacto en español."
+        desc: "S alveolar enfática; más oscura y profunda."
       },
       "ðˤ": {
         ejemplo: "d suave enfática",
-        desc: "Versión enfática de ð; más profunda, sin equivalente directo en español."
+        desc: "Versión enfática de ð; más profunda."
+      },
+      "l": {
+        ejemplo: "l de «luna»",
+        desc: "No estaba en tu tabla original, pero la mostramos para que no se pierda."
       }
     };
 
+    function arabicToIPAString(text) {
+      let ipa = "";
+      for (const ch of text) {
+        if (arabicToIPA[ch] !== undefined) {
+          ipa += arabicToIPA[ch];
+        } else if (ch === " " || ch === "\t" || ch === "\n") {
+          ipa += " ";
+        } else {
+          // carácter desconocido
+          ipa += "?";
+        }
+      }
+      return ipa.trim();
+    }
+
     function tokenizeIPA(input) {
-      // Ordenar por longitud para capturar primero los fonemas largos (iː, sˤ, ðˤ, etc.)
       const phonemes = [
         "iː", "sˤ", "ðˤ",
         "ʔ", "ʕ", "θ", "ð", "ʃ",
         "a", "u", "b", "t", "m", "d", "f",
-        "j", "n", "i", "q", "h", "z", "w", "r", "k"
+        "j", "n", "i", "q", "h", "z", "w", "r", "k", "l"
       ];
 
       const tokens = [];
       let i = 0;
 
       while (i < input.length) {
-        // Ignorar espacios, barras y otros separadores
         const ch = input[i];
         if (ch === " " || ch === "/" || ch === "|" || ch === "\n" || ch === "\t") {
           i++;
@@ -259,7 +327,6 @@
         }
 
         let matched = null;
-
         for (const ph of phonemes) {
           if (input.startsWith(ph, i)) {
             matched = ph;
@@ -271,7 +338,6 @@
           tokens.push(matched);
           i += matched.length;
         } else {
-          // Caracter desconocido: lo guardamos como símbolo suelto
           tokens.push(input[i]);
           i++;
         }
@@ -280,16 +346,21 @@
       return tokens;
     }
 
-    function analyzeIPA() {
-      const input = document.getElementById("ipaInput").value.trim();
+    function convertArabicToIPA() {
+      const arabic = document.getElementById("arabicInput").value.trim();
+      const ipaDiv = document.getElementById("ipaResult");
       const resultDiv = document.getElementById("result");
 
-      if (!input) {
-        resultDiv.innerHTML = "<p>Escribe una frase en IPA para analizarla 🪄</p>";
+      if (!arabic) {
+        ipaDiv.innerHTML = "Escribe una frase en árabe para convertirla 🪄";
+        resultDiv.innerHTML = "";
         return;
       }
 
-      const tokens = tokenizeIPA(input);
+      const ipa = arabicToIPAString(arabic);
+      ipaDiv.innerHTML = `IPA aproximada (con tus fonemas): <span class="example">/${ipa}/</span>`;
+
+      const tokens = tokenizeIPA(ipa);
 
       let html = "<table><thead><tr><th>Fonema</th><th>Ejemplo en español</th><th>Descripción</th></tr></thead><tbody>";
 
@@ -310,7 +381,6 @@
       });
 
       html += "</tbody></table>";
-
       resultDiv.innerHTML = html;
     }
   </script>
