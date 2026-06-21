@@ -2,69 +2,111 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Conversor Árabe</title>
-    <link rel="stylesheet" href="https://pyscript.net/releases/2022.12.1/pyscript.css" />
-    <script defer src="https://pyscript.net/releases/2022.12.1/pyscript.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor Árabe a Buckwalter</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        textarea { width: 100%; margin-bottom: 10px; }
-        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #resultado {
+            background: white;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            min-height: 100px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: monospace;
+        }
+        .label {
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
-    <h2>Conversor de Árabe a Buckwalter</h2>
-    <textarea id="texto-arabe" rows="5" placeholder="Escribe o pega tu texto en árabe aquí..."></textarea><br>
-    <button id="btn-procesar" pys-onClick="procesar" class="bg-blue-500 text-white p-2 rounded">Procesar</button>
+    <h1>Conversor de Árabe a Buckwalter</h1>
     
-    <h3>Resultado:</h3>
-    <pre id="resultado">El resultado aparecerá aquí...</pre>
+    <div class="label">Texto en árabe:</div>
+    <textarea id="texto-arabe" placeholder="Escribe o pega tu texto en árabe aquí..."></textarea>
+    
+    <button onclick="procesar()">Convertir a Buckwalter</button>
+    <button onclick="limpiar()" style="background: #6c757d;">Limpiar</button>
+    
+    <div class="label">Resultado:</div>
+    <div id="resultado">El resultado aparecerá aquí...</div>
 
-    <py-script>
-        import re
+    <script>
+        // Mapeo de caracteres árabes a Buckwalter
+        const buckwalter = {
+            '\u0628': 'b', '\u0630': '*', '\u0637': 'T', '\u0645': 'm',
+            '\u062a': 't', '\u0631': 'r', '\u0638': 'Z', '\u0646': 'n',
+            '\u062b': '^', '\u0632': 'z', '\u0639': 'E', '\u0647': 'h',
+            '\u062c': 'j', '\u0633': 's', '\u063a': 'g', '\u062d': 'H',
+            '\u0642': 'q', '\u0641': 'f', '\u062e': 'x', '\u0635': 'S',
+            '\u0634': '$', '\u062f': 'd', '\u0636': 'D', '\u0643': 'k',
+            '\u0623': '>', '\u0621': "'", '\u0626': '}', '\u0624': '&',
+            '\u0625': '<', '\u0622': '|', '\u0627': 'A', '\u0649': 'Y',
+            '\u0629': 'p', '\u064a': 'y', '\u0644': 'l', '\u0648': 'w',
+            '\u064b': 'F', '\u064c': 'N', '\u064d': 'K', '\u064e': 'a',
+            '\u064f': 'u', '\u0650': 'i', '\u0651': '~', '\u0652': 'o'
+        };
 
-        # --- PARCHES PARA MÓDULOS FALTANTES (Para que no dé error) ---
-        class findstress:
-            @staticmethod
-            def find_stress_index(pronunciation):
-                return -1
+        function arabicToBuckwalter(word) {
+            let result = '';
+            for (let letter of word) {
+                result += buckwalter[letter] || letter;
+            }
+            return result;
+        }
 
-        class arabic_utils:
-            @staticmethod
-            def remove_diacritics(text):
-                return text
-        # -------------------------------------------------------------
-
-        # --- TU CÓDIGO PYTHON ORIGINAL ---
-        buckwalter = {  u'\u0628': u'b', u'\u0630': u'*', u'\u0637': u'T', u'\u0645': u'm', u'\u062a': u't', u'\u0631': u'r', u'\u0638': u'Z', u'\u0646': u'n', u'\u062b': u'^', u'\u0632': u'z', u'\u0639': u'E', u'\u0647': u'h', u'\u062c': u'j', u'\u0633': u's', u'\u063a': u'g', u'\u062d': u'H', u'\u0642': u'q', u'\u0641': u'f', u'\u062e': u'x', u'\u0635': u'S', u'\u0634': u'$', u'\u062f': u'd', u'\u0636': u'D', u'\u0643': u'k', u'\u0623': u'>', u'\u0621': u'\'', u'\u0626': u'}', u'\u0624': u'&', u'\u0625': u'<', u'\u0622': u'|', u'\u0627': u'A', u'\u0649': u'Y', u'\u0629': u'p', u'\u064a': u'y', u'\u0644': u'l', u'\u0648': u'w', u'\u064b': u'F', u'\u064c': u'N', u'\u064d': u'K', u'\u064e': u'a', u'\u064f': u'u', u'\u0650': u'i', u'\u0651': u'~', u'\u0652': u'o' }
-        ArabicScript = {  u'b': u'\u0628', u'*': u'\u0630', u'T': u'\u0637', u'm': u'\u0645', u't': u'\u062a', u'r': u'\u0631', u'Z': u'\u0638', u'n': u'\u0646', u'^': u'\u062b', u'z': u'\u0632', u'E': u'\u0639', u'h': u'\u0647', u'j': u'\u062c', u's': u'\u0633', u'g': u'\u063a', u'H': u'\u062d', u'q': u'\u0642', u'f': u'\u0641', u'x': u'\u062e', u'S': u'\u0635', u'$': u'\u0634', u'd': u'\u062f', u'D': u'\u0636', u'k': u'\u0643', u'>': u'\u0623', u'\'': u'\u0621', u'}': u'\u0626', u'&': u'\u0624', u'<': u'\u0625', u'|': u'\u0622', u'A': u'\u0627', u'Y': u'\u0649', u'p': u'\u0629', u'y': u'\u064a', u'l': u'\u0644', u'w': u'\u0648', u'F': u'\u064b', u'N': u'\u064c', u'K': u'\u064d', u'a': u'\u064e', u'u': u'\u064f', u'i': u'\u0650', u'~': u'\u0651', u'o': u'\u0652' }
-
-        def arabicToBuckwalter(word):
-            result = u''
-            for letter in word:
-                if letter in buckwalter: result += buckwalter[letter]
-                else: result += letter
-            return result
-
-        def buckwalterToArabic(word):
-            result = u''
-            for letter in word:
-                if letter in ArabicScript: result += ArabicScript[letter]
-                else: result += letter
-            return result
-
-        # (Nota: He omitido las funciones phonetise() y phonetise_word() completas aquí para que la web cargue rápido, 
-        # pero si las necesitas enteras, puedes pegarlas justo debajo de buckwalterToArabic).
-        
-        # --- FUNCIÓN PARA EL BOTÓN DE LA WEB ---
-        def procesar(event):
-            texto = Element("texto-arabe").value
-            if not texto.strip():
-                Element("resultado").write("Por favor, escribe algo en árabe.")
-                return
+        function procesar() {
+            const texto = document.getElementById('texto-arabe').value;
+            if (!texto.trim()) {
+                document.getElementById('resultado').textContent = 'Por favor, escribe algo en árabe.';
+                return;
+            }
             
-            # Convertimos el texto completo a Buckwalter
-            resultado = arabicToBuckwalter(texto)
-            Element("resultado").write(resultado)
-    </py-script>
+            const resultado = arabicToBuckwalter(texto);
+            document.getElementById('resultado').textContent = resultado;
+        }
+
+        function limpiar() {
+            document.getElementById('texto-arabe').value = '';
+            document.getElementById('resultado').textContent = 'El resultado aparecerá aquí...';
+        }
+    </script>
 </body>
 </html>
