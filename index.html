@@ -146,36 +146,31 @@
   </div>
 
   <script>
-    // Mapa muy simplificado de letras árabes → fonemas IPA (solo tus fonemas)
-    // OJO: es aproximado y limitado, pensado para practicar, no para uso académico estricto.
     const arabicToIPA = {
-      "ا": "ʔa",   // inicio de vocal
-      "أ": "ʔa",
-      "إ": "ʔi",
-      "آ": "ʔa",
+      "ا": "ʔa", "أ": "ʔa", "إ": "ʔi", "آ": "ʔa",
       "ء": "ʔ",
       "ب": "b",
       "ت": "t",
       "ث": "θ",
       "ج": "j",
       "ح": "h",
-      "خ": "h",   // usando h para fricativa fuerte
+      "خ": "h",
       "د": "d",
       "ذ": "ð",
       "ر": "r",
       "ز": "z",
-      "س": "sˤ",  // usando tu sˤ como s general
+      "س": "sˤ",
       "ش": "ʃ",
       "ص": "sˤ",
       "ض": "ðˤ",
       "ط": "t",
       "ظ": "ðˤ",
       "ع": "ʕ",
-      "غ": "ʕ",   // aproximación
+      "غ": "ʕ",
       "ف": "f",
       "ق": "q",
       "ك": "k",
-      "ل": "l",   // no está en tu inventario, lo marcamos aparte
+      "ل": "l",
       "م": "m",
       "ن": "n",
       "ه": "h",
@@ -186,161 +181,67 @@
       "ِ": "i",
       "ُ": "u",
       "ْ": "",
-      "ّ": ""     // no tratamos geminación aquí
+      "ّ": ""
     };
 
-    // Diccionario de fonemas → aproximación en español
     const phonemeMap = {
-      "a": {
-        ejemplo: "a de «casa»",
-        desc: "Vocal abierta, muy similar a la a española."
-      },
-      "u": {
-        ejemplo: "u de «luna»",
-        desc: "Vocal cerrada posterior, igual que la u española."
-      },
-      "i": {
-        ejemplo: "i de «vino»",
-        desc: "Vocal cerrada anterior, igual que la i española."
-      },
-      "iː": {
-        ejemplo: "i larga",
-        desc: "Como la i de «vino» pero sostenida más tiempo."
-      },
-      "b": {
-        ejemplo: "b de «barco»",
-        desc: "Oclusiva sonora, similar a la b española en posición fuerte."
-      },
-      "t": {
-        ejemplo: "t de «taco»",
-        desc: "Oclusiva sorda, más seca que la t española."
-      },
-      "d": {
-        ejemplo: "d de «dado»",
-        desc: "Oclusiva sonora, más limpia que la d fricativa de «cada»."
-      },
-      "m": {
-        ejemplo: "m de «mano»",
-        desc: "Nasal bilabial, igual que en español."
-      },
-      "n": {
-        ejemplo: "n de «noche»",
-        desc: "Nasal alveolar, igual que en español."
-      },
-      "f": {
-        ejemplo: "f de «foca»",
-        desc: "Fricativa labiodental sorda, igual que en español."
-      },
-      "k": {
-        ejemplo: "c de «casa»",
-        desc: "Oclusiva velar sorda, igual que la k/c española."
-      },
-      "r": {
-        ejemplo: "r suave de «pero»",
-        desc: "Vibrante simple, como la r entre vocales en español."
-      },
-      "w": {
-        ejemplo: "u semiconsonante de «hueso»",
-        desc: "Aproximante labiovelar, similar a la u en diptongos."
-      },
-      "j": {
-        ejemplo: "y de «yo»",
-        desc: "Aproximante palatal, similar a la y española."
-      },
-      "z": {
-        ejemplo: "z de «zapato» (España)",
-        desc: "Fricativa interdental sonora; en Latinoamérica se parece a una s sonora."
-      },
-      "θ": {
-        ejemplo: "z de «zapato» (España)",
-        desc: "Fricativa interdental sorda; no existe en la mayoría del español latino."
-      },
-      "ð": {
-        ejemplo: "d suave de «cada»",
-        desc: "Fricativa dental sonora, como la d floja entre vocales."
-      },
-      "ʃ": {
-        ejemplo: "sh de «shampoo»",
-        desc: "Fricativa postalveolar sorda; aparece en préstamos en español."
-      },
-      "ʔ": {
-        ejemplo: "corte en «¡eh!»",
-        desc: "Oclusiva glotal; pequeño golpe de cierre en la garganta."
-      },
-      "ʕ": {
-        ejemplo: "no existe en español",
-        desc: "Aproximante faríngea sonora; sonido gutural profundo."
-      },
-      "q": {
-        ejemplo: "k muy profunda",
-        desc: "Oclusiva uvular sorda; como una k hecha más atrás."
-      },
-      "h": {
-        ejemplo: "j suave de «México»",
-        desc: "Fricativa glotal sorda; similar a una j suave latinoamericana."
-      },
-      "sˤ": {
-        ejemplo: "s enfática",
-        desc: "S alveolar enfática; más oscura y profunda."
-      },
-      "ðˤ": {
-        ejemplo: "d suave enfática",
-        desc: "Versión enfática de ð; más profunda."
-      },
-      "l": {
-        ejemplo: "l de «luna»",
-        desc: "No estaba en tu tabla original, pero la mostramos para que no se pierda."
-      }
+      "a": { ejemplo: "a de «casa»", desc: "Vocal abierta." },
+      "u": { ejemplo: "u de «luna»", desc: "Vocal cerrada posterior." },
+      "i": { ejemplo: "i de «vino»", desc: "Vocal cerrada anterior." },
+      "iː": { ejemplo: "i larga", desc: "Versión larga de i." },
+      "b": { ejemplo: "b de «barco»", desc: "Oclusiva sonora." },
+      "t": { ejemplo: "t de «taco»", desc: "Más seca que la española." },
+      "d": { ejemplo: "d de «dado»", desc: "Oclusiva limpia." },
+      "m": { ejemplo: "m de «mano»", desc: "Nasal bilabial." },
+      "n": { ejemplo: "n de «noche»", desc: "Nasal alveolar." },
+      "f": { ejemplo: "f de «foca»", desc: "Fricativa labiodental." },
+      "k": { ejemplo: "c de «casa»", desc: "Oclusiva velar." },
+      "r": { ejemplo: "r suave de «pero»", desc: "Vibrante simple." },
+      "w": { ejemplo: "u de «hueso»", desc: "Semiconsonante." },
+      "j": { ejemplo: "y de «yo»", desc: "Aproximante palatal." },
+      "z": { ejemplo: "z de España", desc: "Interdental sonora." },
+      "θ": { ejemplo: "z de España", desc: "Interdental sorda." },
+      "ð": { ejemplo: "d suave de «cada»", desc: "Fricativa dental." },
+      "ʃ": { ejemplo: "sh de «shampoo»", desc: "Postalveolar sorda." },
+      "ʔ": { ejemplo: "corte en «¡eh!»", desc: "Oclusiva glotal." },
+      "ʕ": { ejemplo: "no existe", desc: "Faríngea sonora." },
+      "q": { ejemplo: "k profunda", desc: "Uvular sorda." },
+      "h": { ejemplo: "j suave", desc: "Glotal sorda." },
+      "sˤ": { ejemplo: "s enfática", desc: "Oscura y profunda." },
+      "ðˤ": { ejemplo: "d enfática", desc: "Versión profunda." },
+      "l": { ejemplo: "l de «luna»", desc: "Lateral alveolar." }
     };
 
     function arabicToIPAString(text) {
       let ipa = "";
       for (const ch of text) {
-        if (arabicToIPA[ch] !== undefined) {
-          ipa += arabicToIPA[ch];
-        } else if (ch === " " || ch === "\t" || ch === "\n") {
-          ipa += " ";
-        } else {
-          // carácter desconocido
-          ipa += "?";
-        }
+        if (arabicToIPA[ch] !== undefined) ipa += arabicToIPA[ch];
+        else if (ch.trim() === "") ipa += " ";
+        else ipa += "?";
       }
       return ipa.trim();
     }
 
     function tokenizeIPA(input) {
       const phonemes = [
-        "iː", "sˤ", "ðˤ",
-        "ʔ", "ʕ", "θ", "ð", "ʃ",
-        "a", "u", "b", "t", "m", "d", "f",
-        "j", "n", "i", "q", "h", "z", "w", "r", "k", "l"
+        "iː","sˤ","ðˤ","ʔ","ʕ","θ","ð","ʃ",
+        "a","u","b","t","m","d","f","j","n",
+        "i","q","h","z","w","r","k","l"
       ];
 
       const tokens = [];
       let i = 0;
 
       while (i < input.length) {
-        const ch = input[i];
-        if (ch === " " || ch === "/" || ch === "|" || ch === "\n" || ch === "\t") {
-          i++;
-          continue;
-        }
+        if (input[i].trim() === "") { i++; continue; }
 
         let matched = null;
         for (const ph of phonemes) {
-          if (input.startsWith(ph, i)) {
-            matched = ph;
-            break;
-          }
+          if (input.startsWith(ph, i)) { matched = ph; break; }
         }
 
-        if (matched) {
-          tokens.push(matched);
-          i += matched.length;
-        } else {
-          tokens.push(input[i]);
-          i++;
-        }
+        if (matched) { tokens.push(matched); i += matched.length; }
+        else { tokens.push(input[i]); i++; }
       }
 
       return tokens;
@@ -358,11 +259,11 @@
       }
 
       const ipa = arabicToIPAString(arabic);
-      ipaDiv.innerHTML = `IPA aproximada (con tus fonemas): <span class="example">/${ipa}/</span>`;
+      ipaDiv.innerHTML = `IPA aproximada: <span class="example">/${ipa}/</span>`;
 
       const tokens = tokenizeIPA(ipa);
 
-      let html = "<table><thead><tr><th>Fonema</th><th>Ejemplo en español</th><th>Descripción</th></tr></thead><tbody>";
+      let html = "<table><thead><tr><th>Fonema</th><th>Ejemplo</th><th>Descripción</th></tr></thead><tbody>";
 
       tokens.forEach(token => {
         if (phonemeMap[token]) {
@@ -374,8 +275,8 @@
         } else {
           html += `<tr>
             <td class="phoneme">${token}</td>
-            <td>—</td>
-            <td>Este símbolo no está en tu inventario definido.</td>
+            <td>Sin ejemplo</td>
+            <td>Fonema no configurado (puedes añadirlo al mapa).</td>
           </tr>`;
         }
       });
