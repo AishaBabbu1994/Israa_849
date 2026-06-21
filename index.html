@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Herramienta de Transliteración Árabe</title>
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=YOUR_KEY"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f9fbfd; color: #2c3e50; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { max-width: 1000px; width: 100%; background: #fff; padding: 40px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.05); margin-top: 20px; }
@@ -19,12 +20,14 @@
         .buttons { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 20px; }
         button { padding: 14px 28px; font-size: 16px; font-weight: 600; border: none; border-radius: 10px; cursor: pointer; color: #fff; transition: transform 0.2s; }
         button:hover { transform: translateY(-2px); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .btn-transliterate { background: #2980b9; }
         .btn-diacritics { background: #27ae60; }
         .btn-remove { background: #c0392b; }
         .btn-listen { background: #8e44ad; }
         .status { text-align: center; margin-top: 25px; font-style: italic; color: #7f8c8d; min-height: 24px; }
         .note { margin-top: 40px; padding: 20px; background: #eaf2f8; border-left: 5px solid #2980b9; border-radius: 8px; font-size: 0.95em; }
+        .voice-info { background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 8px; display: none; }
     </style>
 </head>
 <body>
@@ -33,6 +36,11 @@
     <h1>Herramienta de Transliteración Árabe</h1>
     <p class="subtitle">Convierte texto árabe a script latino y escucha la pronunciación.</p>
     
+    <div id="voiceWarning" class="voice-info">
+        ⚠️ <strong>Importante:</strong> Para escuchar el árabe con buena calidad, necesitas instalar voces árabes en tu sistema. 
+        <a href="https://support.google.com/chrome/answer/11130060" target="_blank">Ver cómo instalar voces</a>
+    </div>
+
     <div class="text-area-container">
         <div class="text-box">
             <label for="arabicInput">Texto Árabe</label>
@@ -48,29 +56,58 @@
         <button class="btn-transliterate" onclick="transliterate()">Transliterar</button>
         <button class="btn-diacritics" onclick="addDiacritics()">Añadir Diacríticos</button>
         <button class="btn-remove" onclick="removeDiacritics()">Eliminar Diacríticos</button>
-        <button class="btn-listen" onclick="listen()">🔊 Escuchar</button>
+        <button class="btn-listen" id="listenBtn" onclick="listen()" disabled>🔊 Cargando voces...</button>
     </div>
     
     <div class="status" id="status"></div>
 
     <div class="note">
-        <strong>Nota:</strong> El audio usa la voz nativa de tu dispositivo. Si no escuchas nada, verifica que tu sistema operativo tenga instalada una voz en árabe.
+        <strong>Calidad de audio:</strong> Esta herramienta usa las voces de tu sistema operativo. Para mejor calidad:
+        <ul>
+            <li><strong>Windows:</strong> Configuración → Hora e idioma → Idioma → Árabe → Opciones → Descargar voz</li>
+            <li><strong>Mac:</strong> Preferencias → Accesibilidad → Voz → Descargar voz árabe</li>
+            <li><strong>Móvil:</strong> Las voces suelen estar preinstaladas</li>
+        </ul>
     </div>
 </div>
 
 <script>
-    // Cargar voces al inicio
+    let voices = [];
+    let arabicVoice = null;
+
+    // Cargar voces disponibles
+    function loadVoices() {
+        if ('speechSynthesis' in window) {
+            voices = speechSynthesis.getVoices();
+            arabicVoice = voices.find(v => v.lang.startsWith('ar') && v.lang.includes('SA')) || 
+                          voices.find(v => v.lang.startsWith('ar'));
+            
+            const btn = document.getElementById('listenBtn');
+            if (arabicVoice) {
+                btn.disabled = false;
+                btn.textContent = '🔊 Escuchar';
+                console.log('Voz árabe encontrada:', arabicVoice.name);
+            } else {
+                btn.disabled = true;
+                btn.textContent = '⚠️ Sin voz árabe';
+                document.getElementById('voiceWarning').style.display = 'block';
+                showStatus('No se encontró voz árabe. Instala una voz en tu sistema.');
+            }
+        }
+    }
+
     if ('speechSynthesis' in window) {
-        speechSynthesis.getVoices();
-        speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+        loadVoices();
+        speechSynthesis.onvoiceschanged = loadVoices;
+        setTimeout(loadVoices, 1000);
     }
 
     const transliterationMap = {
-        'ا': 'ā', 'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j', 'ح': '', 'خ': 'kh',
+        'ا': 'ā', 'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j', 'ح': 'ḥ', 'خ': 'kh',
         'د': 'd', 'ذ': 'dh', 'ر': 'r', 'ز': 'z', 'س': 's', 'ش': 'sh', 'ص': 'ṣ',
         'ض': 'ḍ', 'ط': 'ṭ', 'ظ': 'ẓ', 'ع': 'ʿ', 'غ': 'gh', 'ف': 'f', 'ق': 'q',
         'ك': 'k', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h', 'و': 'w', 'ي': 'y',
-        'ء': '', 'آ': 'ʾā', 'أ': 'ʾa', 'إ': 'ʾi', 'ؤ': 'ʾu', 'ئ': 'ʾi',
+        'ء': 'ʼ', 'آ': 'ʾā', 'أ': 'ʾa', 'إ': 'ʾi', 'ؤ': 'ʾu', 'ئ': 'ʾi',
         'ة': 'ah', 'ى': 'ā',
         'َ': 'a', 'ُ': 'u', 'ِ': 'i', 'ً': 'an', 'ٌ': 'un', 'ٍ': 'in',
         'ّ': '', 'ْ': '', ' ': ' ', '\n': '\n'
@@ -105,7 +142,7 @@
         for (let i = 0; i < input.length; i++) {
             const char = input[i];
             const code = char.charCodeAt(0);
-            const isConsonant = (code >= 0x0628 && code <= 0x064A) && code !== 0x0648 && code !== 0x064A;
+            const isConsonant = (code >= 0x0628 && code <= 0x064A);
             if (isConsonant && (i === input.length - 1 || char.charCodeAt(0) < 0x064B || char.charCodeAt(0) > 0x0652)) {
                 output += char + 'َ';
             } else { output += char; }
@@ -118,31 +155,32 @@
         const text = document.getElementById('arabicInput').value;
         if (!text.trim()) { showStatus('Introduce texto para escuchar.'); return; }
 
-        if ('speechSynthesis' in window) {
-            speechSynthesis.cancel(); // Detener audio anterior
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ar-SA';
-            utterance.rate = 0.9;
-
-            // Buscar voz árabe específica
-            const voices = speechSynthesis.getVoices();
-            const arabicVoice = voices.find(voice => voice.lang.startsWith('ar'));
-            if (arabicVoice) utterance.voice = arabicVoice;
-
-            utterance.onstart = () => showStatus('Reproduciendo...');
-            utterance.onend = () => showStatus('');
-            utterance.onerror = () => showStatus('Error: Tu navegador no tiene voz árabe instalada.');
-
-            speechSynthesis.speak(utterance);
-        } else {
-            showStatus('Tu navegador no soporta audio.');
+        if (!arabicVoice) {
+            showStatus('No hay voz árabe disponible. Instala una voz en tu sistema.');
+            return;
         }
+
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.voice = arabicVoice;
+        utterance.lang = 'ar-SA';
+        utterance.rate = 0.85;
+        utterance.pitch = 1;
+
+        utterance.onstart = () => showStatus('🔊 Reproduciendo...');
+        utterance.onend = () => showStatus('');
+        utterance.onerror = (e) => {
+            console.error('Error:', e);
+            showStatus('Error al reproducir. Verifica que la voz esté instalada.');
+        };
+
+        speechSynthesis.speak(utterance);
     }
 
     function showStatus(msg) {
         const status = document.getElementById('status');
         status.textContent = msg;
-        if(msg) setTimeout(() => { if (status.textContent === msg) status.textContent = ''; }, 4000);
+        if(msg) setTimeout(() => { if (status.textContent === msg) status.textContent = ''; }, 5000);
     }
 </script>
 </body>
