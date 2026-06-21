@@ -146,6 +146,7 @@
   </div>
 
   <script>
+    // Mapa árabe → IPA usando SOLO fonemas configurados
     const arabicToIPA = {
       "ا": "ʔa", "أ": "ʔa", "إ": "ʔi", "آ": "ʔa",
       "ء": "ʔ",
@@ -184,6 +185,7 @@
       "ّ": ""
     };
 
+    // Fonemas → español
     const phonemeMap = {
       "a": { ejemplo: "a de «casa»", desc: "Vocal abierta." },
       "u": { ejemplo: "u de «luna»", desc: "Vocal cerrada posterior." },
@@ -212,14 +214,19 @@
       "l": { ejemplo: "l de «luna»", desc: "Lateral alveolar." }
     };
 
+    // Solo generamos IPA con fonemas conocidos; si algo no está, lo ignoramos
     function arabicToIPAString(text) {
       let ipa = "";
       for (const ch of text) {
-        if (arabicToIPA[ch] !== undefined) ipa += arabicToIPA[ch];
-        else if (ch.trim() === "") ipa += " ";
-        else ipa += "?";
+        if (arabicToIPA[ch] !== undefined) {
+          ipa += arabicToIPA[ch];
+        } else if (ch.trim() === "") {
+          ipa += " ";
+        } else {
+          // carácter no mapeado: lo ignoramos para no generar errores
+        }
       }
-      return ipa.trim();
+      return ipa.trim().replace(/\s+/g, " ");
     }
 
     function tokenizeIPA(input) {
@@ -237,11 +244,19 @@
 
         let matched = null;
         for (const ph of phonemes) {
-          if (input.startsWith(ph, i)) { matched = ph; break; }
+          if (input.startsWith(ph, i)) {
+            matched = ph;
+            break;
+          }
         }
 
-        if (matched) { tokens.push(matched); i += matched.length; }
-        else { tokens.push(input[i]); i++; }
+        if (matched) {
+          tokens.push(matched);
+          i += matched.length;
+        } else {
+          // símbolo raro: lo ignoramos
+          i++;
+        }
       }
 
       return tokens;
@@ -266,19 +281,12 @@
       let html = "<table><thead><tr><th>Fonema</th><th>Ejemplo</th><th>Descripción</th></tr></thead><tbody>";
 
       tokens.forEach(token => {
-        if (phonemeMap[token]) {
-          html += `<tr>
-            <td class="phoneme">${token}</td>
-            <td>${phonemeMap[token].ejemplo}</td>
-            <td>${phonemeMap[token].desc}</td>
-          </tr>`;
-        } else {
-          html += `<tr>
-            <td class="phoneme">${token}</td>
-            <td>Sin ejemplo</td>
-            <td>Fonema no configurado (puedes añadirlo al mapa).</td>
-          </tr>`;
-        }
+        const info = phonemeMap[token];
+        html += `<tr>
+          <td class="phoneme">${token}</td>
+          <td>${info.ejemplo}</td>
+          <td>${info.desc}</td>
+        </tr>`;
       });
 
       html += "</tbody></table>";
