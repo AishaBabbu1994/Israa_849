@@ -1,297 +1,130 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Árabe → IPA → Español</title>
+  <meta charset="UTF-8" />
+  <title>Mini cliente Groq</title>
   <style>
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: system-ui, sans-serif;
       background: #0b0c10;
-      color: #f8f8ff;
-      margin: 0;
-      padding: 0;
+      color: #c5c6c7;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
     }
-
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 0.5rem;
-    }
-
-    h2 {
-      margin-top: 2rem;
-    }
-
     .card {
-      background: #151720;
-      border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      border: 1px solid #3b3f5c;
-      margin-bottom: 1.5rem;
+      background: #1f2833;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
     }
-
     label {
       display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-    }
-
-    textarea, input {
-      width: 100%;
-      border-radius: 8px;
-      border: 1px solid #3b3f5c;
-      padding: 0.75rem;
-      font-size: 1rem;
-      background: #0f1118;
-      color: #f8f8ff;
-      resize: vertical;
-    }
-
-    button {
-      margin-top: 1rem;
-      padding: 0.6rem 1.2rem;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      background: linear-gradient(135deg, #8a2be2, #ff6bd5);
-      color: #fff;
-      box-shadow: 0 0 12px rgba(255, 107, 213, 0.5);
-    }
-
-    button:hover {
-      filter: brightness(1.1);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1.5rem;
-      font-size: 0.95rem;
-    }
-
-    th, td {
-      padding: 0.6rem 0.4rem;
-      border-bottom: 1px solid #2b2f45;
-      text-align: left;
-    }
-
-    th {
-      background: #1f2230;
-      position: sticky;
-      top: 0;
-    }
-
-    .phoneme {
-      font-weight: 700;
-      color: #ffb3ff;
-    }
-
-    .footer {
-      margin-top: 2rem;
-      text-align: center;
-      font-size: 0.8rem;
-      color: #aaa;
-    }
-
-    .hint {
-      font-size: 0.85rem;
-      color: #c0c0ff;
-      margin-top: 0.5rem;
-    }
-
-    .example {
-      font-family: "Courier New", monospace;
+      margin-bottom: 6px;
       font-size: 0.9rem;
-      color: #ffd6ff;
     }
-
-    .ipa-output {
-      margin-top: 0.8rem;
-      font-family: "Courier New", monospace;
-      font-size: 1rem;
-      color: #ffb3ff;
+    input, textarea, button {
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #45a29e;
+      background: #0b0c10;
+      color: #c5c6c7;
+      box-sizing: border-box;
+    }
+    button {
+      cursor: pointer;
+      background: #45a29e;
+      color: #0b0c10;
+      font-weight: bold;
+      border: none;
+    }
+    button:hover {
+      background: #66fcf1;
+    }
+    pre {
+      background: #0b0c10;
+      padding: 10px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      border: 1px solid #45a29e;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Árabe → IPA → Español</h1>
-    <p style="text-align:center;">Escribe una frase en árabe y mira su IPA con comparación a sonidos del español.</p>
+  <div class="card">
+    <h2>Cliente Groq (Chat)</h2>
 
-    <div class="card">
-      <label for="arabicInput">Frase en árabe:</label>
-      <input id="arabicInput" dir="rtl" placeholder="اكتب في الدفتر">
-      <div class="hint">
-        Ejemplo: <span class="example">اكتب في الدفتر</span>
-      </div>
-      <button onclick="convertArabicToIPA()">Convertir a IPA y analizar</button>
+    <!-- Barra para ingresar el API key -->
+    <label for="apiKey">API Key de Groq</label>
+    <input type="password" id="apiKey" placeholder="Pega aquí tu API key" />
 
-      <div id="ipaResult" class="ipa-output"></div>
-    </div>
+    <!-- Prompt -->
+    <label for="prompt">Mensaje para el modelo</label>
+    <textarea id="prompt" rows="4" placeholder="Escribe tu pregunta o mensaje..."></textarea>
 
-    <h2>Comparación fonema por fonema</h2>
-    <div id="result"></div>
+    <button id="sendBtn">Enviar a Groq</button>
 
-    <div class="footer">
-      Herramienta casera de fonética ✨<br>
-      Súbela a GitHub Pages y úsala como tu laboratorio de árabe.
-    </div>
+    <h3>Respuesta</h3>
+    <pre id="response">Aquí aparecerá la respuesta del modelo...</pre>
   </div>
 
   <script>
-    // Mapa árabe → IPA usando SOLO fonemas configurados
-    const arabicToIPA = {
-      "ا": "ʔa", "أ": "ʔa", "إ": "ʔi", "آ": "ʔa",
-      "ء": "ʔ",
-      "ب": "b",
-      "ت": "t",
-      "ث": "θ",
-      "ج": "j",
-      "ح": "h",
-      "خ": "h",
-      "د": "d",
-      "ذ": "ð",
-      "ر": "r",
-      "ز": "z",
-      "س": "sˤ",
-      "ش": "ʃ",
-      "ص": "sˤ",
-      "ض": "ðˤ",
-      "ط": "t",
-      "ظ": "ðˤ",
-      "ع": "ʕ",
-      "غ": "ʕ",
-      "ف": "f",
-      "ق": "q",
-      "ك": "k",
-      "ل": "l",
-      "م": "m",
-      "ن": "n",
-      "ه": "h",
-      "و": "w",
-      "ي": "j",
-      "ى": "a",
-      "َ": "a",
-      "ِ": "i",
-      "ُ": "u",
-      "ْ": "",
-      "ّ": ""
-    };
+    const sendBtn = document.getElementById("sendBtn");
+    const apiKeyInput = document.getElementById("apiKey");
+    const promptInput = document.getElementById("prompt");
+    const responseBox = document.getElementById("response");
 
-    // Fonemas → español
-    const phonemeMap = {
-      "a": { ejemplo: "a de «casa»", desc: "Vocal abierta." },
-      "u": { ejemplo: "u de «luna»", desc: "Vocal cerrada posterior." },
-      "i": { ejemplo: "i de «vino»", desc: "Vocal cerrada anterior." },
-      "iː": { ejemplo: "i larga", desc: "Versión larga de i." },
-      "b": { ejemplo: "b de «barco»", desc: "Oclusiva sonora." },
-      "t": { ejemplo: "t de «taco»", desc: "Más seca que la española." },
-      "d": { ejemplo: "d de «dado»", desc: "Oclusiva limpia." },
-      "m": { ejemplo: "m de «mano»", desc: "Nasal bilabial." },
-      "n": { ejemplo: "n de «noche»", desc: "Nasal alveolar." },
-      "f": { ejemplo: "f de «foca»", desc: "Fricativa labiodental." },
-      "k": { ejemplo: "c de «casa»", desc: "Oclusiva velar." },
-      "r": { ejemplo: "r suave de «pero»", desc: "Vibrante simple." },
-      "w": { ejemplo: "u de «hueso»", desc: "Semiconsonante." },
-      "j": { ejemplo: "y de «yo»", desc: "Aproximante palatal." },
-      "z": { ejemplo: "z de España", desc: "Interdental sonora." },
-      "θ": { ejemplo: "z de España", desc: "Interdental sorda." },
-      "ð": { ejemplo: "d suave de «cada»", desc: "Fricativa dental." },
-      "ʃ": { ejemplo: "sh de «shampoo»", desc: "Postalveolar sorda." },
-      "ʔ": { ejemplo: "corte en «¡eh!»", desc: "Oclusiva glotal." },
-      "ʕ": { ejemplo: "no existe", desc: "Faríngea sonora." },
-      "q": { ejemplo: "k profunda", desc: "Uvular sorda." },
-      "h": { ejemplo: "j suave", desc: "Glotal sorda." },
-      "sˤ": { ejemplo: "s enfática", desc: "Oscura y profunda." },
-      "ðˤ": { ejemplo: "d enfática", desc: "Versión profunda." },
-      "l": { ejemplo: "l de «luna»", desc: "Lateral alveolar." }
-    };
+    sendBtn.addEventListener("click", async () => {
+      const apiKey = apiKeyInput.value.trim();
+      const prompt = promptInput.value.trim();
 
-    // Solo generamos IPA con fonemas conocidos; si algo no está, lo ignoramos
-    function arabicToIPAString(text) {
-      let ipa = "";
-      for (const ch of text) {
-        if (arabicToIPA[ch] !== undefined) {
-          ipa += arabicToIPA[ch];
-        } else if (ch.trim() === "") {
-          ipa += " ";
-        } else {
-          // carácter no mapeado: lo ignoramos para no generar errores
-        }
+      if (!apiKey) {
+        alert("Por favor, ingresa tu API key de Groq.");
+        return;
       }
-      return ipa.trim().replace(/\s+/g, " ");
-    }
-
-    function tokenizeIPA(input) {
-      const phonemes = [
-        "iː","sˤ","ðˤ","ʔ","ʕ","θ","ð","ʃ",
-        "a","u","b","t","m","d","f","j","n",
-        "i","q","h","z","w","r","k","l"
-      ];
-
-      const tokens = [];
-      let i = 0;
-
-      while (i < input.length) {
-        if (input[i].trim() === "") { i++; continue; }
-
-        let matched = null;
-        for (const ph of phonemes) {
-          if (input.startsWith(ph, i)) {
-            matched = ph;
-            break;
-          }
-        }
-
-        if (matched) {
-          tokens.push(matched);
-          i += matched.length;
-        } else {
-          // símbolo raro: lo ignoramos
-          i++;
-        }
-      }
-
-      return tokens;
-    }
-
-    function convertArabicToIPA() {
-      const arabic = document.getElementById("arabicInput").value.trim();
-      const ipaDiv = document.getElementById("ipaResult");
-      const resultDiv = document.getElementById("result");
-
-      if (!arabic) {
-        ipaDiv.innerHTML = "Escribe una frase en árabe para convertirla 🪄";
-        resultDiv.innerHTML = "";
+      if (!prompt) {
+        alert("Escribe un mensaje para el modelo.");
         return;
       }
 
-      const ipa = arabicToIPAString(arabic);
-      ipaDiv.innerHTML = `IPA aproximada: <span class="example">/${ipa}/</span>`;
+      responseBox.textContent = "Consultando a Groq...";
 
-      const tokens = tokenizeIPA(ipa);
+      try {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: "llama-3.1-8b-instant", // Cambia el modelo si quieres otro
+            messages: [
+              { role: "user", content: prompt }
+            ]
+          })
+        });
 
-      let html = "<table><thead><tr><th>Fonema</th><th>Ejemplo</th><th>Descripción</th></tr></thead><tbody>";
+        if (!res.ok) {
+          const errorText = await res.text();
+          responseBox.textContent = `Error: ${res.status}\n${errorText}`;
+          return;
+        }
 
-      tokens.forEach(token => {
-        const info = phonemeMap[token];
-        html += `<tr>
-          <td class="phoneme">${token}</td>
-          <td>${info.ejemplo}</td>
-          <td>${info.desc}</td>
-        </tr>`;
-      });
-
-      html += "</tbody></table>";
-      resultDiv.innerHTML = html;
-    }
+        const data = await res.json();
+        const content = data.choices?.[0]?.message?.content || "Sin contenido recibido.";
+        responseBox.textContent = content;
+      } catch (err) {
+        responseBox.textContent = "Error al llamar a la API:\n" + err;
+      }
+    });
   </script>
 </body>
 </html>
+```
