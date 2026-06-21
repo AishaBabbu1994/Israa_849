@@ -331,7 +331,7 @@
     <div class="container">
         <div class="header">
             <h1>🔤 Transliterador Árabe</h1>
-            <p>Convierte texto árabe a pronunciación SMS para hispanohablantes</p>
+            <p>Convierte texto árabe a pronunciación para hispanohablantes</p>
         </div>
 
         <div class="input-section">
@@ -358,11 +358,11 @@
             </div>
 
             <div class="pronunciation-guide">
-                <h4>🗣️ Símbolos Especiales (Estilo Árabe SMS)</h4>
-                <p><strong>7</strong> = hamza (pausa glotal) - como en mensajes de texto árabes</p>
-                <p><strong>3</strong> = ain (pausa profunda desde la garganta)</p>
-                <p><strong>aa, ii, uu</strong> = vocales largas alargadas</p>
-                <p><strong>(m)</strong> = masculino | <strong>(f)</strong> = femenino</p>
+                <h4>️ Símbolos Especiales</h4>
+                <p><strong>sh</strong> = sonido como en "show"</p>
+                <p><strong>3</strong> = ain (sonido de garganta)</p>
+                <p><strong>gh</strong> = sonido suave como en francés</p>
+                <p><strong>h</strong> = h aspirada suave</p>
             </div>
         </div>
 
@@ -384,23 +384,23 @@
     <div class="copy-notification" id="notification">¡Copiado al portapapeles!</div>
 
     <script>
-        // MAPEO DIRECTO: Letra Árabe → Pronunciación Hispanizada (versión SMS)
+        // MAPEO ACTUALIZADO: Más claro y pronunciable en español
         const PRONUNCIACION = {
             // Consonantes básicas
-            'ب': 'b', 'ت': 't', 'ث': 'z', 'ج': 'y', 'ح': 'j',
+            'ب': 'b', 'ت': 't', 'ث': 'z', 'ج': 'y', 'ح': 'h',
             'خ': 'j', 'د': 'd', 'ذ': 'd', 'ر': 'r', 'ز': 'z',
-            'س': 's', 'ش': 'ch', 'ص': 's', 'ض': 'd', 'ط': 't',
-            'ظ': 'z', 'ع': '3', 'غ': 'g', 'ف': 'f', 'ق': 'c',
-            'ك': 'c', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h',
-            'و': 'u', 'ي': 'i',
+            'س': 's', 'ش': 'sh', 'ص': 's', 'ض': 'd', 'ط': 't',
+            'ظ': 'z', 'ع': '3', 'غ': 'gh', 'ف': 'f', 'ق': 'q',
+            'ك': 'k', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h',
+            'و': 'w', 'ي': 'y',
             
             // Alif variantes
             'ا': 'a', 'أ': 'a', 'إ': 'i', 'آ': 'aa', 'ى': 'a',
             
-            // Ta Marbuta
-            'ة': 't',
+            // Ta Marbuta (femenino)
+            'ة': 'a',
             
-            // Hamza - NÚMERO 7 (estilo árabe SMS)
+            // Hamza
             'ء': '7',
             
             // Vocales y diacríticos
@@ -415,30 +415,30 @@
             { arab: 'ت', nombre: 'ta', hispano: 't' },
             { arab: 'ث', nombre: 'za', hispano: 'z' },
             { arab: 'ج', nombre: 'ya', hispano: 'y' },
-            { arab: 'ح', nombre: 'ha', hispano: 'j suave' },
+            { arab: 'ح', nombre: 'ha', hispano: 'h suave' },
             { arab: 'خ', nombre: 'ja', hispano: 'j fuerte' },
             { arab: 'د', nombre: 'dal', hispano: 'd' },
             { arab: 'ذ', nombre: 'dal', hispano: 'd suave' },
             { arab: 'ر', nombre: 'ra', hispano: 'r' },
             { arab: 'ز', nombre: 'zay', hispano: 'z' },
             { arab: 'س', nombre: 'sin', hispano: 's' },
-            { arab: 'ش', nombre: 'shin', hispano: 'ch' },
+            { arab: 'ش', nombre: 'shin', hispano: 'sh' },
             { arab: 'ص', nombre: 'sad', hispano: 's' },
             { arab: 'ض', nombre: 'dad', hispano: 'd' },
             { arab: 'ط', nombre: 'ta', hispano: 't' },
             { arab: 'ظ', nombre: 'za', hispano: 'z' },
             { arab: 'ع', nombre: 'ain', hispano: '3' },
-            { arab: 'غ', nombre: 'ghain', hispano: 'g' },
+            { arab: 'غ', nombre: 'ghain', hispano: 'gh' },
             { arab: 'ف', nombre: 'fa', hispano: 'f' },
-            { arab: 'ق', nombre: 'qaf', hispano: 'c' },
-            { arab: 'ك', nombre: 'kaf', hispano: 'c' },
+            { arab: 'ق', nombre: 'qaf', hispano: 'q' },
+            { arab: 'ك', nombre: 'kaf', hispano: 'k' },
             { arab: 'ل', nombre: 'lam', hispano: 'l' },
             { arab: 'م', nombre: 'mim', hispano: 'm' },
             { arab: 'ن', nombre: 'nun', hispano: 'n' },
             { arab: 'ه', nombre: 'ha', hispano: 'h' },
-            { arab: 'و', nombre: 'waw', hispano: 'u' },
-            { arab: 'ي', nombre: 'ya', hispano: 'i' },
-            { arab: 'ة', nombre: 'ta marbuta', hispano: 't' }
+            { arab: 'و', nombre: 'waw', hispano: 'w' },
+            { arab: 'ي', nombre: 'ya', hispano: 'y' },
+            { arab: 'ة', nombre: 'ta marbuta', hispano: 'a' }
         ];
 
         const VOCALES = [
@@ -469,7 +469,6 @@
 
         // Función para limpiar diacríticos árabes no deseados
         function limpiarDiacriticos(texto) {
-            // Eliminar diacríticos Unicode que causan caracteres extraños
             return texto.replace(/[\u064B-\u065F\u0670\u0640\u0652]/g, '');
         }
 
@@ -482,7 +481,6 @@
         }
 
         function traducir(texto) {
-            // Limpiar diacríticos problemáticos primero
             texto = limpiarDiacriticos(texto);
             
             let resultado = '';
@@ -490,63 +488,50 @@
                 const char = texto[i];
                 const siguiente = i < texto.length - 1 ? texto[i + 1] : '';
                 
-                // Manejar vocales largas
+                // Vocales largas
                 if (char === 'َ' && siguiente === 'ا') {
-                    // Evitar duplicar si ya termina en 'a'
                     if (resultado.length === 0 || resultado.slice(-1) !== 'a') {
                         resultado += 'aa';
                     }
-                    i++; // Saltar el alif
+                    i++;
                     continue;
                 }
                 if (char === 'ِ' && siguiente === 'ي') {
-                    // Evitar duplicar si ya termina en 'i'
                     if (resultado.length === 0 || resultado.slice(-1) !== 'i') {
                         resultado += 'ii';
                     }
-                    i++; // Saltar el ya
+                    i++;
                     continue;
                 }
                 if (char === 'ُ' && siguiente === 'و') {
-                    // Evitar duplicar si ya termina en 'u'
                     if (resultado.length === 0 || resultado.slice(-1) !== 'u') {
                         resultado += 'uu';
                     }
-                    i++; // Saltar el waw
+                    i++;
                     continue;
                 }
                 
                 const traduccion = PRONUNCIACION[char];
                 
-                // Solo agregar si existe traducción y no es un espacio duplicado
                 if (traduccion !== undefined) {
-                    // Evitar vocales repetidas consecutivas
-                    if (traduccion === 'a' && resultado.slice(-1) === 'a') {
-                        continue;
-                    }
-                    if (traduccion === 'i' && resultado.slice(-1) === 'i') {
-                        continue;
-                    }
-                    if (traduccion === 'u' && resultado.slice(-1) === 'u') {
-                        continue;
-                    }
-                    // Evitar espacios duplicados
-                    if (traduccion === ' ' && resultado.slice(-1) === ' ') {
-                        continue;
-                    }
+                    // Evitar vocales simples repetidas
+                    if (traduccion === 'a' && resultado.slice(-1) === 'a') continue;
+                    if (traduccion === 'i' && resultado.slice(-1) === 'i') continue;
+                    if (traduccion === 'u' && resultado.slice(-1) === 'u') continue;
+                    if (traduccion === ' ' && resultado.slice(-1) === ' ') continue;
                     resultado += traduccion;
                 }
             }
             
-            // Limpieza final: eliminar caracteres extraños y normalizar
+            // Limpieza final
             resultado = resultado
-                .replace(/°/g, '')           // Eliminar grados
-                .replace(/˚/g, '')           // Eliminar ring above
-                .replace(/˳/g, '')           // Eliminar otros símbolos
-                .replace(/ii+/g, 'ii')       // Normalizar ii múltiples
-                .replace(/uu+/g, 'uu')       // Normalizar uu múltiples
-                .replace(/aa+/g, 'aa')       // Normalizar aa múltiples
-                .replace(/ +/g, ' ')         // Espacios múltiples a uno
+                .replace(/°/g, '')
+                .replace(/˚/g, '')
+                .replace(/˳/g, '')
+                .replace(/ii+/g, 'ii')
+                .replace(/uu+/g, 'uu')
+                .replace(/aa+/g, 'aa')
+                .replace(/ +/g, ' ')
                 .trim();
             
             return resultado;
