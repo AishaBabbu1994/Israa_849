@@ -3,335 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transliterador Árabe - Para Hispanohablantes</title>
+    <title>Transliterador Árabe</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 900px;
-            width: 100%;
-            padding: 40px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .header h1 {
-            color: #333;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            color: #666;
-            font-size: 1.1em;
-        }
-
-        .input-section {
-            margin-bottom: 30px;
-        }
-
-        .input-section label {
-            display: block;
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1.1em;
-            font-family: 'Arial', sans-serif;
-            resize: vertical;
-            min-height: 120px;
-            direction: rtl;
-            transition: border-color 0.3s;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        button {
-            padding: 12px 30px;
-            font-size: 1.05em;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-translate {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .btn-translate:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-clear {
-            background: #f0f0f0;
-            color: #333;
-            min-width: 120px;
-        }
-
-        .btn-clear:hover {
-            background: #e0e0e0;
-        }
-
-        .btn-copy {
-            background: #4caf50;
-            color: white;
-            min-width: 120px;
-        }
-
-        .btn-copy:hover {
-            background: #45a049;
-        }
-
-        .output-section {
-            margin-top: 30px;
-        }
-
-        .output-section label {
-            display: block;
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-
-        .output-box {
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 8px;
-            border: 2px solid #e0e0e0;
-            min-height: 120px;
-            word-wrap: break-word;
-            font-size: 1.15em;
-            line-height: 2;
-            color: #333;
-            font-weight: 500;
-        }
-
-        .output-box h4 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 0.95em;
-            text-transform: uppercase;
-        }
-
-        .pronunciation-line {
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .pronunciation-line:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-
-        .pronunciation-main {
-            font-size: 1.25em;
-            color: #d84315;
-            font-weight: bold;
-            margin-bottom: 5px;
-            letter-spacing: 0.5px;
-        }
-
-        .pronunciation-note {
-            font-size: 0.85em;
-            color: #999;
-            font-style: italic;
-        }
-
-        .pronunciation-guide {
-            background: #e3f2fd;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-            margin-top: 20px;
-        }
-
-        .pronunciation-guide h4 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .pronunciation-guide p {
-            color: #333;
-            font-size: 0.95em;
-            line-height: 1.6;
-            margin-bottom: 8px;
-        }
-
-        .info-section {
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 2px solid #e0e0e0;
-        }
-
-        .info-section h3 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .tables-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9em;
-        }
-
-        table th {
-            background: #667eea;
-            color: white;
-            padding: 10px;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        table td {
-            padding: 8px 10px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        table tr:hover {
-            background: #f5f5f5;
-        }
-
-        .copy-notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #4caf50;
-            color: white;
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            z-index: 1000;
-        }
-
-        .copy-notification.show {
-            opacity: 1;
-        }
-
-        .word-breakdown {
-            background: #fff3cd;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #ffc107;
-            margin-top: 15px;
-        }
-
-        .word-item {
-            margin-bottom: 15px;
-            padding: 15px;
-            background: white;
-            border-radius: 5px;
-            border-left: 3px solid #ffc107;
-        }
-
-        .word-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .word-arabic {
-            font-weight: 600;
-            color: #333;
-            direction: rtl;
-            margin-bottom: 8px;
-            font-size: 1.1em;
-        }
-
-        .word-spanish {
-            color: #d84315;
-            font-size: 1em;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .word-meaning {
-            color: #666;
-            font-size: 0.9em;
-            font-style: italic;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-
-            .header h1 {
-                font-size: 1.8em;
-            }
-
-            .tables-container {
-                grid-template-columns: 1fr;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
-
-            .btn-translate {
-                width: 100%;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; display: flex; justify-content: center; align-items: center; }
+        .container { background: white; border-radius: 15px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 900px; width: 100%; padding: 40px; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { color: #333; font-size: 2.5em; margin-bottom: 10px; }
+        .header p { color: #666; font-size: 1.1em; }
+        .input-section { margin-bottom: 30px; }
+        .input-section label { display: block; color: #333; font-weight: 600; margin-bottom: 10px; font-size: 1.1em; }
+        textarea { width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1.1em; resize: vertical; min-height: 120px; direction: rtl; }
+        textarea:focus { outline: none; border-color: #667eea; }
+        .button-group { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        button { padding: 12px 30px; font-size: 1.05em; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-translate { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; flex: 1; min-width: 200px; }
+        .btn-clear { background: #f0f0f0; color: #333; min-width: 120px; }
+        .btn-copy { background: #4caf50; color: white; min-width: 120px; }
+        .output-box { background: #f5f5f5; padding: 20px; border-radius: 8px; border: 2px solid #e0e0e0; min-height: 80px; font-size: 1.3em; color: #d84315; font-weight: bold; }
+        .pronunciation-guide { background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 20px; }
+        .pronunciation-guide p { color: #333; margin-bottom: 5px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🔤 Transliterador Árabe</h1>
-            <p>Convierte texto árabe a pronunciación para hispanohablantes</p>
+            <p>Convierte texto árabe a pronunciación clara</p>
         </div>
 
         <div class="input-section">
@@ -340,287 +38,74 @@
         </div>
 
         <div class="button-group">
-            <button class="btn-translate" onclick="window.translateText()">Traducir a Fonética</button>
+            <button class="btn-translate" onclick="window.translateText()">Traducir</button>
             <button class="btn-copy" onclick="window.copyOutput()">Copiar</button>
             <button class="btn-clear" onclick="window.clearAll()">Limpiar</button>
         </div>
 
         <div class="output-section">
-            <label>📢 Pronunciación para Hispanohablantes:</label>
-            <div class="output-box" id="hispanicOutput">
-                <h4>Resultado</h4>
-                La pronunciación aparecerá aquí
-            </div>
-
-            <div class="word-breakdown" id="wordBreakdown" style="display: none;">
-                <h4>📚 Desglose Palabra por Palabra</h4>
-                <div id="wordList"></div>
-            </div>
+            <label>📢 Resultado:</label>
+            <div class="output-box" id="hispanicOutput">La pronunciación aparecerá aquí</div>
 
             <div class="pronunciation-guide">
-                <h4>️ Símbolos Especiales</h4>
-                <p><strong>sh</strong> = sonido como en "show"</p>
-                <p><strong>3</strong> = ain (sonido de garganta)</p>
-                <p><strong>gh</strong> = sonido suave como en francés</p>
-                <p><strong>h</strong> = h aspirada suave</p>
-            </div>
-        </div>
-
-        <div class="info-section">
-            <h3>📚 Guía de Letras Árabes</h3>
-            <div class="tables-container">
-                <div>
-                    <h4 style="margin-bottom: 10px;">Consonantes</h4>
-                    <table id="lettersTable"></table>
-                </div>
-                <div>
-                    <h4 style="margin-bottom: 10px;">Vocales y Marcas</h4>
-                    <table id="diacriticsTable"></table>
-                </div>
+                <h4>Guía rápida:</h4>
+                <p><strong>h</strong> = aspirada suave | <strong>kh</strong> = jota fuerte</p>
+                <p><strong>sh</strong> = ch | <strong>gh</strong> = g suave | <strong>dh</strong> = d suave</p>
             </div>
         </div>
     </div>
 
-    <div class="copy-notification" id="notification">¡Copiado al portapapeles!</div>
-
     <script>
-        // MAPEO ACTUALIZADO: Más claro y pronunciable en español
         const PRONUNCIACION = {
-            // Consonantes básicas
             'ب': 'b', 'ت': 't', 'ث': 'z', 'ج': 'y', 'ح': 'h',
-            'خ': 'j', 'د': 'd', 'ذ': 'd', 'ر': 'r', 'ز': 'z',
+            'خ': 'kh', 'د': 'd', 'ذ': 'dh', 'ر': 'r', 'ز': 'z',
             'س': 's', 'ش': 'sh', 'ص': 's', 'ض': 'd', 'ط': 't',
-            'ظ': 'z', 'ع': '3', 'غ': 'gh', 'ف': 'f', 'ق': 'q',
+            'ظ': 'z', 'ع': 'e', 'غ': 'gh', 'ف': 'f', 'ق': 'q',
             'ك': 'k', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h',
-            'و': 'w', 'ي': 'y',
-            
-            // Alif variantes
+            'و': 'u', 'ي': 'i',
             'ا': 'a', 'أ': 'a', 'إ': 'i', 'آ': 'aa', 'ى': 'a',
-            
-            // Ta Marbuta (femenino)
-            'ة': 'a',
-            
-            // Hamza
-            'ء': '7',
-            
-            // Vocales y diacríticos
-            'َ': 'a', 'ُ': 'u', 'ِ': 'i', 'ً': 'an', 'ٌ': 'un',
-            'ٍ': 'in', 'ّ': '', 'ْ': '', 
-            
+            'ة': 'a', 'ء': '',
+            'َ': 'a', 'ُ': 'u', 'ِ': 'i', 'ً': '', 'ٌ': '', 'ٍ': '', 'ّ': '', 'ْ': '',
             ' ': ' '
         };
 
-        const LETRAS = [
-            { arab: 'ب', nombre: 'ba', hispano: 'b' },
-            { arab: 'ت', nombre: 'ta', hispano: 't' },
-            { arab: 'ث', nombre: 'za', hispano: 'z' },
-            { arab: 'ج', nombre: 'ya', hispano: 'y' },
-            { arab: 'ح', nombre: 'ha', hispano: 'h suave' },
-            { arab: 'خ', nombre: 'ja', hispano: 'j fuerte' },
-            { arab: 'د', nombre: 'dal', hispano: 'd' },
-            { arab: 'ذ', nombre: 'dal', hispano: 'd suave' },
-            { arab: 'ر', nombre: 'ra', hispano: 'r' },
-            { arab: 'ز', nombre: 'zay', hispano: 'z' },
-            { arab: 'س', nombre: 'sin', hispano: 's' },
-            { arab: 'ش', nombre: 'shin', hispano: 'sh' },
-            { arab: 'ص', nombre: 'sad', hispano: 's' },
-            { arab: 'ض', nombre: 'dad', hispano: 'd' },
-            { arab: 'ط', nombre: 'ta', hispano: 't' },
-            { arab: 'ظ', nombre: 'za', hispano: 'z' },
-            { arab: 'ع', nombre: 'ain', hispano: '3' },
-            { arab: 'غ', nombre: 'ghain', hispano: 'gh' },
-            { arab: 'ف', nombre: 'fa', hispano: 'f' },
-            { arab: 'ق', nombre: 'qaf', hispano: 'q' },
-            { arab: 'ك', nombre: 'kaf', hispano: 'k' },
-            { arab: 'ل', nombre: 'lam', hispano: 'l' },
-            { arab: 'م', nombre: 'mim', hispano: 'm' },
-            { arab: 'ن', nombre: 'nun', hispano: 'n' },
-            { arab: 'ه', nombre: 'ha', hispano: 'h' },
-            { arab: 'و', nombre: 'waw', hispano: 'w' },
-            { arab: 'ي', nombre: 'ya', hispano: 'y' },
-            { arab: 'ة', nombre: 'ta marbuta', hispano: 'a' }
-        ];
-
-        const VOCALES = [
-            { arab: 'َ', nombre: 'fatha', hispano: 'a' },
-            { arab: 'ُ', nombre: 'damma', hispano: 'u' },
-            { arab: 'ِ', nombre: 'kasra', hispano: 'i' },
-            { arab: 'ً', nombre: 'fathatan', hispano: 'an' },
-            { arab: 'ٌ', nombre: 'dammatan', hispano: 'un' },
-            { arab: 'ٍ', nombre: 'kasratan', hispano: 'in' },
-            { arab: 'ْ', nombre: 'sukun', hispano: 'sin vocal' }
-        ];
-
-        // Diccionario de palabras comunes
-        const DICCIONARIO = {
-            'سلام': 'saludo',
-            'ليلة': 'noche',
-            'يوم': 'día',
-            'ماء': 'agua',
-            'نار': 'fuego',
-            'حب': 'amor',
-            'خوف': 'miedo',
-            'فرح': 'alegría',
-            'حزن': 'tristeza',
-            'شمس': 'sol',
-            'قمر': 'luna',
-            'نجم': 'estrella'
-        };
-
-        // Función para limpiar diacríticos árabes no deseados
         function limpiarDiacriticos(texto) {
-            return texto.replace(/[\u064B-\u065F\u0670\u0640\u0652]/g, '');
-        }
-
-        function inicializarTablas() {
-            document.getElementById('lettersTable').innerHTML = '<tr><th>Árabe</th><th>Pronunciación</th></tr>' +
-                LETRAS.map(l => `<tr><td style="font-size: 1.3em; text-align: center;">${l.arab}</td><td><strong>${l.hispano}</strong></td></tr>`).join('');
-
-            document.getElementById('diacriticsTable').innerHTML = '<tr><th>Marca</th><th>Pronunciación</th></tr>' +
-                VOCALES.map(v => `<tr><td style="font-size: 1.2em; text-align: center;">${v.arab}</td><td><strong>${v.hispano}</strong></td></tr>`).join('');
+            return texto.replace(/[\u064B-\u065F\u0670\u0640]/g, '');
         }
 
         function traducir(texto) {
             texto = limpiarDiacriticos(texto);
-            
             let resultado = '';
             for (let i = 0; i < texto.length; i++) {
                 const char = texto[i];
-                const siguiente = i < texto.length - 1 ? texto[i + 1] : '';
-                
-                // Vocales largas
-                if (char === 'َ' && siguiente === 'ا') {
-                    if (resultado.length === 0 || resultado.slice(-1) !== 'a') {
-                        resultado += 'aa';
-                    }
-                    i++;
-                    continue;
-                }
-                if (char === 'ِ' && siguiente === 'ي') {
-                    if (resultado.length === 0 || resultado.slice(-1) !== 'i') {
-                        resultado += 'ii';
-                    }
-                    i++;
-                    continue;
-                }
-                if (char === 'ُ' && siguiente === 'و') {
-                    if (resultado.length === 0 || resultado.slice(-1) !== 'u') {
-                        resultado += 'uu';
-                    }
-                    i++;
-                    continue;
-                }
-                
-                const traduccion = PRONUNCIACION[char];
-                
-                if (traduccion !== undefined) {
-                    // Evitar vocales simples repetidas
-                    if (traduccion === 'a' && resultado.slice(-1) === 'a') continue;
-                    if (traduccion === 'i' && resultado.slice(-1) === 'i') continue;
-                    if (traduccion === 'u' && resultado.slice(-1) === 'u') continue;
-                    if (traduccion === ' ' && resultado.slice(-1) === ' ') continue;
-                    resultado += traduccion;
+                const trad = PRONUNCIACION[char];
+                if (trad !== undefined) {
+                    if (trad === ' ' && resultado.slice(-1) === ' ') continue;
+                    resultado += trad;
                 }
             }
-            
-            // Limpieza final
-            resultado = resultado
-                .replace(/°/g, '')
-                .replace(/˚/g, '')
-                .replace(/˳/g, '')
-                .replace(/ii+/g, 'ii')
-                .replace(/uu+/g, 'uu')
-                .replace(/aa+/g, 'aa')
-                .replace(/ +/g, ' ')
-                .trim();
-            
-            return resultado;
-        }
-
-        function extraerPalabras(texto) {
-            return texto.trim().split(/\s+/).filter(p => p.length > 0);
-        }
-
-        function generarVariantes(palabra, traduccion) {
-            if (palabra.endsWith('ة')) {
-                const palabraMasculina = palabra.slice(0, -1);
-                const traduccionMasculina = traducir(palabraMasculina);
-                return `
-                    <div class="pronunciation-line">
-                        <div class="pronunciation-main">${traduccionMasculina}</div>
-                        <div class="pronunciation-note">(a un hombre)</div>
-                    </div>
-                    <div class="pronunciation-line">
-                        <div class="pronunciation-main">${traduccion}</div>
-                        <div class="pronunciation-note">(a una mujer)</div>
-                    </div>
-                `;
-            } else {
-                return `
-                    <div class="pronunciation-line">
-                        <div class="pronunciation-main">${traduccion}</div>
-                    </div>
-                `;
-            }
+            return resultado.replace(/ +/g, ' ').trim();
         }
 
         window.translateText = function() {
             const input = document.getElementById('arabicInput').value;
             const outputDiv = document.getElementById('hispanicOutput');
-            const wordBreakdownDiv = document.getElementById('wordBreakdown');
-            const wordListDiv = document.getElementById('wordList');
-
             if (!input.trim()) {
-                outputDiv.innerHTML = '<h4>⚠️ Esperando entrada</h4>Ingresa texto árabe';
-                wordBreakdownDiv.style.display = 'none';
+                outputDiv.innerText = 'Ingresa texto árabe';
                 return;
             }
-
-            const traduccion = traducir(input);
-            const palabras = extraerPalabras(input);
-
-            let outputHTML = '<h4>Pronunciación</h4>';
-            
-            if (palabras.length === 1) {
-                outputHTML += generarVariantes(palabras[0], traducir(palabras[0]));
-            } else {
-                outputHTML += `<div class="pronunciation-main">${traduccion}</div>`;
-            }
-
-            outputDiv.innerHTML = outputHTML;
-
-            if (palabras.length > 0) {
-                wordListDiv.innerHTML = palabras.map(palabra => {
-                    const pron = traducir(palabra);
-                    const significado = DICCIONARIO[palabra] || 'palabra';
-                    return `
-                        <div class="word-item">
-                            <div class="word-arabic">${palabra}</div>
-                            <div class="word-spanish">${pron}</div>
-                            <div class="word-meaning">» ${significado}</div>
-                        </div>
-                    `;
-                }).join('');
-                wordBreakdownDiv.style.display = 'block';
-            }
+            outputDiv.innerText = traducir(input);
         };
 
         window.copyOutput = function() {
             const text = document.getElementById('hispanicOutput').innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                document.getElementById('notification').classList.add('show');
-                setTimeout(() => document.getElementById('notification').classList.remove('show'), 2000);
-            });
+            navigator.clipboard.writeText(text).then(() => alert('¡Copiado!'));
         };
 
         window.clearAll = function() {
             document.getElementById('arabicInput').value = '';
-            document.getElementById('hispanicOutput').innerHTML = '<h4>Resultado</h4>La pronunciación aparecerá aquí';
-            document.getElementById('wordBreakdown').style.display = 'none';
-            document.getElementById('arabicInput').focus();
+            document.getElementById('hispanicOutput').innerText = 'La pronunciación aparecerá aquí';
         };
-
-        window.addEventListener('DOMContentLoaded', inicializarTablas);
     </script>
 </body>
 </html>
