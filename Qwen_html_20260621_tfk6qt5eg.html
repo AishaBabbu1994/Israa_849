@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herramienta de Transliteración Árabe</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9fbfd;
+            color: #2c3e50;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+            margin-top: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #1a5276;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #5d6d7e;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        .text-area-container {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .text-box {
+            flex: 1;
+            min-width: 320px;
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+        textarea {
+            width: 100%;
+            height: 250px;
+            padding: 18px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 18px;
+            resize: vertical;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+        textarea:focus {
+            border-color: #3498db;
+        }
+        #arabicInput {
+            font-family: 'Traditional Arabic', 'Arial', sans-serif;
+            font-size: 26px;
+            direction: rtl;
+            text-align: right;
+            line-height: 1.8;
+        }
+        #latinOutput {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 20px;
+            background-color: #fcfcfc;
+            color: #34495e;
+            line-height: 1.6;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        button {
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #fff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .btn-transliterate { background-color: #2980b9; }
+        .btn-transliterate:hover { background-color: #3498db; }
+        .btn-diacritics { background-color: #27ae60; }
+        .btn-diacritics:hover { background-color: #2ecc71; }
+        .btn-remove { background-color: #c0392b; }
+        .btn-remove:hover { background-color: #e74c3c; }
+        .btn-listen { background-color: #8e44ad; }
+        .btn-listen:hover { background-color: #9b59b6; }
+        
+        .status {
+            text-align: center;
+            margin-top: 25px;
+            font-style: italic;
+            color: #7f8c8d;
+            min-height: 24px;
+            font-size: 1.1em;
+        }
+        .note {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #eaf2f8;
+            border-left: 5px solid #2980b9;
+            border-radius: 8px;
+            font-size: 0.95em;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 20px; }
+            h1 { font-size: 1.8em; }
+            textarea { height: 200px; }
+            #arabicInput { font-size: 22px; }
+            #latinOutput { font-size: 18px; }
+            button { padding: 12px 20px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Herramienta de Transliteración Árabe</h1>
+    <p class="subtitle">Convierte texto árabe a script latino con alta precisión, gestiona diacríticos y escucha la pronunciación.</p>
+    
+    <div class="text-area-container">
+        <div class="text-box">
+            <label for="arabicInput">Texto Árabe</label>
+            <textarea id="arabicInput" placeholder="اكتب أو الصق النص العربي هنا..."></textarea>
+        </div>
+        <div class="text-box">
+            <label for="latinOutput">Transliteración Latina</label>
+            <textarea id="latinOutput" placeholder="El texto transliterado aparecerá aquí..." readonly></textarea>
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button class="btn-transliterate" onclick="transliterate()">Transliterar</button>
+        <button class="btn-diacritics" onclick="addDiacritics()">Añadir Diacríticos</button>
+        <button class="btn-remove" onclick="removeDiacritics()">Eliminar Diacríticos</button>
+        <button class="btn-listen" onclick="listen()">🔊 Escuchar</button>
+    </div>
+    
+    <div class="status" id="status"></div>
+
+    <div class="note">
+        <strong>Nota sobre la diacritización:</strong> Esta herramienta proporciona un motor de transliteración client-side robusto basado en los estándares ALA-LC e ISO. 
+        La función "Añadir Diacríticos" utiliza un sistema básico basado en reglas para demostración. Para una precisión del 100% comparable con herramientas profesionales (que usan modelos de NLP como Mishkal para analizar casos morfológicos y frecuencia de palabras), se requiere la integración de una API backend.
+    </div>
+</div>
+
+<script>
+    // Mapeo exhaustivo de Árabe a Latino basado en estándares ALA-LC e ISO
+    const transliterationMap = {
+        'ا': 'ā', 'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j', 'ح': 'ḥ', 'خ': 'kh',
+        'د': 'd', 'ذ': 'dh', 'ر': 'r', 'ز': 'z', 'س': 's', 'ش': 'sh', 'ص': 'ṣ',
+        'ض': 'ḍ', 'ط': 'ṭ', 'ظ': 'ẓ', 'ع': 'ʿ', 'غ': 'gh', 'ف': 'f', 'ق': 'q',
+        'ك': 'k', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h', 'و': 'w', 'ي': 'y',
+        'ء': 'ʼ', 'آ': 'ʾā', 'أ': 'ʾa', 'إ': 'ʾi', 'ؤ': 'ʾu', 'ئ': 'ʾi',
+        'ة': 'ah', 'ى': 'ā',
+        'َ': 'a', 'ُ': 'u', 'ِ': 'i', 'ً': 'an', 'ٌ': 'un', 'ٍ': 'in',
+        'ّ': '', 'ْ': '', ' ': ' ', '\n': '\n', ',': ',', '.': '.', '?': '?', '!': '!', '-': '-',
+        '0': '0', '1': '1', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9'
+    };
+
+    function transliterate() {
+        const input = document.getElementById('arabicInput').value;
+        if (!input.trim()) {
+            showStatus('Por favor, introduce texto árabe primero.');
+            return;
+        }
+
+        let output = '';
+        for (let i = 0; i < input.length; i++) {
+            const char = input[i];
+            if (transliterationMap[char] !== undefined) {
+                // Manejar Shadda (ّ) - duplica la consonante anterior
+                if (char === 'ّ' && output.length > 0) {
+                    output += output.slice(-1);
+                } else {
+                    output += transliterationMap[char];
+                }
+            } else {
+                output += char; // Mantener caracteres desconocidos
+            }
+        }
+        
+        document.getElementById('latinOutput').value = output;
+        showStatus('¡Transliteración completada!');
+    }
+
+    function removeDiacritics() {
+        const input = document.getElementById('arabicInput').value;
+        if (!input.trim()) {
+            showStatus('Por favor, introduce texto árabe primero.');
+            return;
+        }
+        // Eliminar diacríticos árabes (Fatha, Damma, Kasra, Sukun, Shadda, Tanwin)
+        const cleaned = input.replace(/[\u064B-\u0652]/g, '');
+        document.getElementById('arabicInput').value = cleaned;
+        showStatus('¡Diacríticos eliminados!');
+    }
+
+    function addDiacritics() {
+        const input = document.getElementById('arabicInput').value;
+        if (!input.trim()) {
+            showStatus('Por favor, introduce texto árabe primero.');
+            return;
+        }
+        
+        // Diacritización básica basada en reglas para demostración
+        let output = '';
+        for (let i = 0; i < input.length; i++) {
+            const char = input[i];
+            if (isArabicConsonant(char) && (i === input.length - 1 || !isDiacritic(input[i+1]))) {
+                output += char + 'َ'; // Fatha por defecto
+            } else {
+                output += char;
+            }
+        }
+        document.getElementById('arabicInput').value = output;
+        showStatus('¡Diacríticos básicos añadidos! (NLP completo requiere backend)');
+    }
+
+    function isArabicConsonant(char) {
+        const code = char.charCodeAt(0);
+        // Consonantes árabes, excluyendo Alif, Waw, Ya que pueden ser vocales
+        return (code >= 0x0621 && code <= 0x064A) && code !== 0x0627 && code !== 0x0648 && code !== 0x064A;
+    }
+
+    function isDiacritic(char) {
+        const code = char.charCodeAt(0);
+        return code >= 0x064B && code <= 0x0652;
+    }
+
+    function listen() {
+        const text = document.getElementById('arabicInput').value;
+        if (!text.trim()) {
+            showStatus('Por favor, introduce texto para escuchar.');
+            return;
+        }
+        // Usar API de Google Translate TTS
+        const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=ar&client=tw-ob`;
+        const audio = new Audio(url);
+        audio.play().then(() => {
+            showStatus('Reproduciendo audio...');
+        }).catch(() => {
+            showStatus('Reproducción bloqueada. Por favor, interactúa con la página primero.');
+        });
+    }
+
+    function showStatus(msg) {
+        const status = document.getElementById('status');
+        status.textContent = msg;
+        setTimeout(() => { status.textContent = ''; }, 4000);
+    }
+</script>
+
+</body>
+</html>
