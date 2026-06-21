@@ -145,10 +145,12 @@
             border: 2px solid #e0e0e0;
             min-height: 120px;
             word-wrap: break-word;
-            font-size: 1.15em;
+            font-size: 1.2em;
             line-height: 2;
             color: #333;
             font-weight: 500;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
         }
 
         .output-box h4 {
@@ -156,6 +158,7 @@
             margin-bottom: 15px;
             font-size: 0.95em;
             text-transform: uppercase;
+            font-family: 'Segoe UI', sans-serif;
         }
 
         .pronunciation-line {
@@ -171,17 +174,19 @@
         }
 
         .pronunciation-main {
-            font-size: 1.25em;
+            font-size: 1.3em;
             color: #d84315;
             font-weight: bold;
             margin-bottom: 5px;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            font-family: 'Courier New', monospace;
         }
 
         .pronunciation-note {
             font-size: 0.85em;
             color: #999;
             font-style: italic;
+            font-family: 'Segoe UI', sans-serif;
         }
 
         .pronunciation-guide {
@@ -293,9 +298,11 @@
 
         .word-spanish {
             color: #d84315;
-            font-size: 1em;
+            font-size: 1.05em;
             font-weight: 600;
             margin-bottom: 5px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.5px;
         }
 
         .word-meaning {
@@ -336,7 +343,7 @@
 
         <div class="input-section">
             <label for="arabicInput">Ingresa el Texto Árabe:</label>
-            <textarea id="arabicInput" placeholder="أدخل النص العربي هنا..."></textarea>
+            <textarea id="arabicInput" placeholder="أدخل ال��ص العربي هنا..."></textarea>
         </div>
 
         <div class="button-group">
@@ -361,7 +368,7 @@
                 <h4>🗣️ Símbolos Especiales (Estilo Árabe SMS)</h4>
                 <p><strong>7</strong> = hamza (pausa glotal) - como en mensajes de texto árabes</p>
                 <p><strong>3</strong> = ain (pausa profunda desde la garganta)</p>
-                <p><strong>aa, ii, uu</strong> = vocales largas alargadas</p>
+                <p><strong>aa, ii, uu</strong> = vocales largas</p>
                 <p><strong>(m)</strong> = masculino | <strong>(f)</strong> = femenino</p>
             </div>
         </div>
@@ -384,7 +391,7 @@
     <div class="copy-notification" id="notification">¡Copiado al portapapeles!</div>
 
     <script>
-        // MAPEO DIRECTO: Letra Árabe → Pronunciación Hispanizada (versión SMS)
+        // MAPEO DIRECTO: Letra Árabe → Pronunciación Hispanizada LIMPIA
         const PRONUNCIACION = {
             // Consonantes básicas
             'ب': 'b', 'ت': 't', 'ث': 'z', 'ج': 'y', 'ح': 'j',
@@ -400,12 +407,16 @@
             // Ta Marbuta
             'ة': 't',
             
-            // Hamza - NÚMERO 7 (estilo árabe SMS)
+            // Hamza - NÚMERO 7
             'ء': '7',
             
             // Vocales y diacríticos
             'َ': 'a', 'ُ': 'u', 'ِ': 'i', 'ً': 'an', 'ٌ': 'un',
-            'ٍ': 'in', 'ّ': '', 'ْ': '', 
+            'ٍ': 'in', 
+            
+            // SHADDA Y SUKUN - IGNORAR COMPLETAMENTE (vacío)
+            'ّ': '', 
+            'ْ': '', 
             
             ' ': ' '
         };
@@ -464,7 +475,8 @@
             'حزن': 'tristeza',
             'شمس': 'sol',
             'قمر': 'luna',
-            'نجم': 'estrella'
+            'نجم': 'estrella',
+            'سيجرون': 'se van'
         };
 
         function inicializarTablas() {
@@ -475,28 +487,45 @@
                 VOCALES.map(v => `<tr><td style="font-size: 1.2em; text-align: center;">${v.arab}</td><td><strong>${v.hispano}</strong></td></tr>`).join('');
         }
 
+        function limpiarResultado(texto) {
+            // Eliminar espacios múltiples
+            texto = texto.replace(/\s+/g, ' ').trim();
+            
+            // Eliminar caracteres especiales vacíos que queden
+            texto = texto.replace(/\s+/g, ' ');
+            
+            return texto;
+        }
+
         function traducir(texto) {
             let resultado = '';
+            let vocalLargaUsada = false;
+            
             for (let i = 0; i < texto.length; i++) {
                 const char = texto[i];
                 const siguiente = i < texto.length - 1 ? texto[i + 1] : '';
                 
+                // Vocales largas - SOLO UNA VEZ
                 if (char === 'َ' && siguiente === 'ا') {
                     resultado += 'aa';
+                    vocalLargaUsada = true;
                     continue;
                 }
                 if (char === 'ِ' && siguiente === 'ي') {
                     resultado += 'ii';
+                    vocalLargaUsada = true;
                     continue;
                 }
                 if (char === 'ُ' && siguiente === 'و') {
                     resultado += 'uu';
+                    vocalLargaUsada = true;
                     continue;
                 }
                 
                 resultado += PRONUNCIACION[char] || char;
             }
-            return resultado.trim();
+            
+            return limpiarResultado(resultado);
         }
 
         function extraerPalabras(texto) {
