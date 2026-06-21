@@ -1,309 +1,318 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transliterador Árabe - Sistema Qamus</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        textarea {
-            width: 100%;
-            height: 150px;
-            padding: 10px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            resize: vertical;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-            flex-wrap: wrap;
-        }
-        button {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-        button.secondary {
-            background: #6c757d;
-        }
-        button.secondary:hover {
-            background: #545b62;
-        }
-        button.success {
-            background: #28a745;
-        }
-        button.success:hover {
-            background: #218838;
-        }
-        #resultado {
-            background: #f8f9fa;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            min-height: 100px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-        }
-        .label {
-            font-weight: bold;
-            margin-top: 15px;
-            margin-bottom: 8px;
-            color: #333;
-        }
-        .checkbox-group {
-            margin: 15px 0;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 5px;
-        }
-        .checkbox-group label {
-            display: block;
-            margin: 5px 0;
-            cursor: pointer;
-        }
-        .info {
-            background: #e7f3ff;
-            padding: 10px;
-            border-left: 4px solid #2196F3;
-            margin: 15px 0;
-            font-size: 14px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Comparador de Fonemas Árabe–Español</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0b0c10;
+      color: #f8f8ff;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    h2 {
+      margin-top: 2rem;
+    }
+
+    .card {
+      background: #151720;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      border: 1px solid #3b3f5c;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 80px;
+      border-radius: 8px;
+      border: 1px solid #3b3f5c;
+      padding: 0.75rem;
+      font-size: 1rem;
+      background: #0f1118;
+      color: #f8f8ff;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 1rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      background: linear-gradient(135deg, #8a2be2, #ff6bd5);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(255, 107, 213, 0.5);
+    }
+
+    button:hover {
+      filter: brightness(1.1);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 0.6rem 0.4rem;
+      border-bottom: 1px solid #2b2f45;
+      text-align: left;
+    }
+
+    th {
+      background: #1f2230;
+      position: sticky;
+      top: 0;
+    }
+
+    .phoneme {
+      font-weight: 700;
+      color: #ffb3ff;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+
+    .hint {
+      font-size: 0.85rem;
+      color: #c0c0ff;
+      margin-top: 0.5rem;
+    }
+
+    .example {
+      font-family: "Courier New", monospace;
+      font-size: 0.9rem;
+      color: #ffd6ff;
+    }
+  </style>
 </head>
 <body>
-    <h1>🔤 Transliterador Árabe</h1>
-    <p class="subtitle">Sistema de Transliteración Qamus.org</p>
-    
-    <div class="container">
-        <div class="info">
-            <strong>Sistema Qamus:</strong> Convierte texto árabe a transliteración ASCII y viceversa. 
-            Incluye todos los caracteres árabes estándar y extendidos (Peh, Tcheh, Veh, Gaf).
-        </div>
+  <div class="container">
+    <h1>Comparador de Fonemas Árabe–Español</h1>
+    <p style="text-align:center;">Escribe tu frase en IPA usando tus fonemas y mira la comparación con sonidos del español.</p>
 
-        <div class="checkbox-group">
-            <label>
-                <input type="checkbox" id="xml-friendly"> 
-                Usar formato XML-friendly (reemplaza < con I, > con O, & con W)
-            </label>
-        </div>
-
-        <div class="label">Texto en árabe:</div>
-        <textarea id="texto-arabe" placeholder="اكتب النص العربي هنا..."></textarea>
-        
-        <div class="button-group">
-            <button onclick="arabeATransliteracion()">➡️ Árabe a Transliteración</button>
-            <button onclick="transliteracionAARabe()">⬅️ Transliteración a Árabe</button>
-            <button onclick="limpiar()" class="secondary">🗑️ Limpiar</button>
-        </div>
-        
-        <div class="label">Resultado:</div>
-        <div id="resultado">El resultado aparecerá aquí...</div>
-        
-        <div class="button-group">
-            <button onclick="copiarResultado()" class="success">📋 Copiar Resultado</button>
-        </div>
+    <div class="card">
+      <label for="ipaInput">Frase en IPA (solo con tus fonemas):</label>
+      <textarea id="ipaInput" placeholder="/ʔuktub fi daktar/"></textarea>
+      <div class="hint">
+        Usa solo estos fonemas: 
+        <span class="example">a, u, b, t, ʔ, ð, sˤ, m, ʕ, d, f, θ, j, n, i, q, h, z, w, r, iː, k, ʃ, ðˤ</span>
+      </div>
+      <button onclick="analyzeIPA()">Analizar frase</button>
     </div>
 
-    <script>
-        // Sistema de transliteración completo de Qamus.org
-        const transliterationMap = {
-            // Hamza y variantes de Alef
-            '\u0621': "'",  // HAMZA
-            '\u0622': '|',  // ALEF WITH MADDA ABOVE
-            '\u0623': '>',  // ALEF WITH HAMZA ABOVE
-            '\u0624': '&',  // WAW WITH HAMZA ABOVE
-            '\u0625': '<',  // ALEF WITH HAMZA BELOW
-            '\u0626': '}',  // YEH WITH HAMZA ABOVE
-            
-            // Consonantes básicas
-            '\u0627': 'A',  // ALEF
-            '\u0628': 'b',  // BEH
-            '\u0629': 'p',  // TEH MARBUTA
-            '\u062A': 't',  // TEH
-            '\u062B': 'v',  // THEH
-            '\u062C': 'j',  // JEEM
-            '\u062D': 'H',  // HAH
-            '\u062E': 'x',  // KHAH
-            '\u062F': 'd',  // DAL
-            '\u0630': '*',  // THAL
-            '\u0631': 'r',  // REH
-            '\u0632': 'z',  // ZAIN
-            '\u0633': 's',  // SEEN
-            '\u0634': '$',  // SHEEN
-            '\u0635': 'S',  // SAD
-            '\u0636': 'D',  // DAD
-            '\u0637': 'T',  // TAH
-            '\u0638': 'Z',  // ZAH
-            '\u0639': 'E',  // AIN
-            '\u063A': 'g',  // GHAIN
-            
-            // Tatweel
-            '\u0640': '_',  // TATWEEL
-            
-            // Más consonantes
-            '\u0641': 'f',  // FEH
-            '\u0642': 'q',  // QAF
-            '\u0643': 'k',  // KAF
-            '\u0644': 'l',  // LAM
-            '\u0645': 'm',  // MEEM
-            '\u0646': 'n',  // NOON
-            '\u0647': 'h',  // HEH
-            '\u0648': 'w',  // WAW
-            '\u0649': 'Y',  // ALEF MAKSURA
-            '\u064A': 'y',  // YEH
-            
-            // Diacríticos (vocales)
-            '\u064B': 'F',  // FATHATAN
-            '\u064C': 'N',  // DAMMATAN
-            '\u064D': 'K',  // KASRATAN
-            '\u064E': 'a',  // FATHA
-            '\u064F': 'u',  // DAMMA
-            '\u0650': 'i',  // KASRA
-            '\u0651': '~',  // SHADDA
-            '\u0652': 'o',  // SUKUN
-            
-            // Caracteres extendidos
-            '\u0670': '`',  // SUPERSCRIPT ALEF
-            '\u0671': '{',  // ALEF WASLA
-            '\u067E': 'P',  // PEH (Persa)
-            '\u0686': 'J',  // TCHEH (Persa)
-            '\u06A4': 'V',  // VEH (Persa)
-            '\u06AF': 'G'   // GAF (Persa/Urdu)
-        };
+    <h2>Resultado</h2>
+    <div id="result"></div>
 
-        // Mapa inverso (transliteración a árabe)
-        const reverseMap = {};
-        for (let arabic in transliterationMap) {
-            let trans = transliterationMap[arabic];
-            reverseMap[trans] = arabic;
+    <div class="footer">
+      Hecho con cariño lingüístico ✨<br>
+      Puedes usarlo en GitHub Pages como tu mini laboratorio de fonética.
+    </div>
+  </div>
+
+  <script>
+    // Diccionario de fonemas → aproximación en español
+    const phonemeMap = {
+      "a": {
+        ejemplo: "a de «casa»",
+        desc: "Vocal abierta, muy similar a la a española."
+      },
+      "u": {
+        ejemplo: "u de «luna»",
+        desc: "Vocal cerrada posterior, igual que la u española."
+      },
+      "i": {
+        ejemplo: "i de «vino»",
+        desc: "Vocal cerrada anterior, igual que la i española."
+      },
+      "iː": {
+        ejemplo: "i larga",
+        desc: "Como la i de «vino» pero sostenida más tiempo (el español no alarga vocales)."
+      },
+      "b": {
+        ejemplo: "b de «barco»",
+        desc: "Oclusiva sonora, similar a la b española en posición fuerte."
+      },
+      "t": {
+        ejemplo: "t de «taco»",
+        desc: "Oclusiva sorda, un poco más seca y sin tanta aspiración que en español."
+      },
+      "d": {
+        ejemplo: "d de «dado»",
+        desc: "Oclusiva sonora, más limpia que la d fricativa de «cada»."
+      },
+      "m": {
+        ejemplo: "m de «mano»",
+        desc: "Nasal bilabial, igual que en español."
+      },
+      "n": {
+        ejemplo: "n de «noche»",
+        desc: "Nasal alveolar, igual que en español."
+      },
+      "f": {
+        ejemplo: "f de «foca»",
+        desc: "Fricativa labiodental sorda, igual que en español."
+      },
+      "k": {
+        ejemplo: "c de «casa»",
+        desc: "Oclusiva velar sorda, igual que la k/c española."
+      },
+      "r": {
+        ejemplo: "r suave de «pero»",
+        desc: "Vibrante simple, como la r entre vocales en español."
+      },
+      "w": {
+        ejemplo: "u semiconsonante de «hueso»",
+        desc: "Aproximante labiovelar, similar a la u en diptongos."
+      },
+      "j": {
+        ejemplo: "y de «yo»",
+        desc: "Aproximante palatal, similar a la y española."
+      },
+      "z": {
+        ejemplo: "z de «zapato» (España)",
+        desc: "Fricativa interdental sonora; en Latinoamérica se parece a una s sonora."
+      },
+      "θ": {
+        ejemplo: "z de «zapato» (España)",
+        desc: "Fricativa interdental sorda; no existe en la mayoría del español latino."
+      },
+      "ð": {
+        ejemplo: "d suave de «cada»",
+        desc: "Fricativa dental sonora, como la d floja entre vocales."
+      },
+      "ʃ": {
+        ejemplo: "sh de «shampoo»",
+        desc: "Fricativa postalveolar sorda; aparece en préstamos en español."
+      },
+      "ʔ": {
+        ejemplo: "corte en «¡eh!»",
+        desc: "Oclusiva glotal; pequeño golpe de cierre en la garganta, ausente en español estándar."
+      },
+      "ʕ": {
+        ejemplo: "no existe en español",
+        desc: "Aproximante faríngea sonora; sonido gutural profundo, sin equivalente directo."
+      },
+      "q": {
+        ejemplo: "k muy profunda",
+        desc: "Oclusiva uvular sorda; como una k hecha más atrás en la garganta."
+      },
+      "h": {
+        ejemplo: "j suave de «México»",
+        desc: "Fricativa glotal sorda; similar a una j suave latinoamericana."
+      },
+      "sˤ": {
+        ejemplo: "s enfática",
+        desc: "S alveolar enfática; más oscura y profunda, sin equivalente exacto en español."
+      },
+      "ðˤ": {
+        ejemplo: "d suave enfática",
+        desc: "Versión enfática de ð; más profunda, sin equivalente directo en español."
+      }
+    };
+
+    function tokenizeIPA(input) {
+      // Ordenar por longitud para capturar primero los fonemas largos (iː, sˤ, ðˤ, etc.)
+      const phonemes = [
+        "iː", "sˤ", "ðˤ",
+        "ʔ", "ʕ", "θ", "ð", "ʃ",
+        "a", "u", "b", "t", "m", "d", "f",
+        "j", "n", "i", "q", "h", "z", "w", "r", "k"
+      ];
+
+      const tokens = [];
+      let i = 0;
+
+      while (i < input.length) {
+        // Ignorar espacios, barras y otros separadores
+        const ch = input[i];
+        if (ch === " " || ch === "/" || ch === "|" || ch === "\n" || ch === "\t") {
+          i++;
+          continue;
         }
 
-        // Versiones XML-friendly
-        const xmlFriendlyMap = {
-            '<': 'I',  // hamza-under-alef
-            '>': 'O',  // hamza-over-alef
-            '&': 'W'   // hamza-on-waw
-        };
+        let matched = null;
 
-        const reverseXmlFriendlyMap = {
-            'I': '<',
-            'O': '>',
-            'W': '&'
-        };
-
-        function arabeATransliteracion() {
-            const texto = document.getElementById('texto-arabe').value;
-            const xmlFriendly = document.getElementById('xml-friendly').checked;
-            
-            if (!texto.trim()) {
-                document.getElementById('resultado').textContent = 'Por favor, escribe algo en árabe.';
-                return;
-            }
-            
-            let resultado = '';
-            for (let char of texto) {
-                if (transliterationMap[char]) {
-                    let trans = transliterationMap[char];
-                    
-                    // Aplicar formato XML-friendly si está activado
-                    if (xmlFriendly && xmlFriendlyMap[trans]) {
-                        trans = xmlFriendlyMap[trans];
-                    }
-                    
-                    resultado += trans;
-                } else {
-                    resultado += char;
-                }
-            }
-            
-            document.getElementById('resultado').textContent = resultado;
+        for (const ph of phonemes) {
+          if (input.startsWith(ph, i)) {
+            matched = ph;
+            break;
+          }
         }
 
-        function transliteracionAARabe() {
-            const texto = document.getElementById('texto-arabe').value;
-            const xmlFriendly = document.getElementById('xml-friendly').checked;
-            
-            if (!texto.trim()) {
-                document.getElementById('resultado').textContent = 'Por favor, escribe la transliteración.';
-                return;
-            }
-            
-            let resultado = '';
-            let textoProcesado = texto;
-            
-            // Si está en modo XML-friendly, convertir primero
-            if (xmlFriendly) {
-                for (let char of textoProcesado) {
-                    if (reverseXmlFriendlyMap[char]) {
-                        textoProcesado = textoProcesado.replace(char, reverseXmlFriendlyMap[char]);
-                    }
-                }
-            }
-            
-            // Convertir transliteración a árabe
-            for (let char of textoProcesado) {
-                if (reverseMap[char]) {
-                    resultado += reverseMap[char];
-                } else {
-                    resultado += char;
-                }
-            }
-            
-            document.getElementById('resultado').textContent = resultado;
+        if (matched) {
+          tokens.push(matched);
+          i += matched.length;
+        } else {
+          // Caracter desconocido: lo guardamos como símbolo suelto
+          tokens.push(input[i]);
+          i++;
         }
+      }
 
-        function limpiar() {
-            document.getElementById('texto-arabe').value = '';
-            document.getElementById('resultado').textContent = 'El resultado aparecerá aquí...';
-        }
+      return tokens;
+    }
 
-        function copiarResultado() {
-            const resultado = document.getElementById('resultado').textContent;
-            navigator.clipboard.writeText(resultado).then(() => {
-                alert('✅ Resultado copiado al portapapeles');
-            }).catch(() => {
-                alert('❌ Error al copiar. Selecciona el texto manualmente.');
-            });
+    function analyzeIPA() {
+      const input = document.getElementById("ipaInput").value.trim();
+      const resultDiv = document.getElementById("result");
+
+      if (!input) {
+        resultDiv.innerHTML = "<p>Escribe una frase en IPA para analizarla 🪄</p>";
+        return;
+      }
+
+      const tokens = tokenizeIPA(input);
+
+      let html = "<table><thead><tr><th>Fonema</th><th>Ejemplo en español</th><th>Descripción</th></tr></thead><tbody>";
+
+      tokens.forEach(token => {
+        if (phonemeMap[token]) {
+          html += `<tr>
+            <td class="phoneme">${token}</td>
+            <td>${phonemeMap[token].ejemplo}</td>
+            <td>${phonemeMap[token].desc}</td>
+          </tr>`;
+        } else {
+          html += `<tr>
+            <td class="phoneme">${token}</td>
+            <td>—</td>
+            <td>Este símbolo no está en tu inventario definido.</td>
+          </tr>`;
         }
-    </script>
+      });
+
+      html += "</tbody></table>";
+
+      resultDiv.innerHTML = html;
+    }
+  </script>
 </body>
 </html>
