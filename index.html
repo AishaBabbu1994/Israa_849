@@ -2,127 +2,100 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Mini cliente Groq</title>
+  <title>Cliente Groq para GitHub Pages</title>
   <style>
     body {
       font-family: system-ui, sans-serif;
       background: #0b0c10;
       color: #c5c6c7;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       padding: 20px;
-    }
-    .card {
-      background: #1f2833;
-      border-radius: 10px;
-      padding: 20px;
-      max-width: 600px;
-      width: 100%;
-      box-shadow: 0 0 10px rgba(0,0,0,0.4);
-    }
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 0.9rem;
+      max-width: 700px;
+      margin: auto;
     }
     input, textarea, button {
       width: 100%;
-      margin-bottom: 12px;
-      padding: 8px;
+      padding: 10px;
+      margin: 10px 0;
       border-radius: 6px;
       border: 1px solid #45a29e;
-      background: #0b0c10;
+      background: #1f2833;
       color: #c5c6c7;
-      box-sizing: border-box;
     }
     button {
-      cursor: pointer;
       background: #45a29e;
       color: #0b0c10;
       font-weight: bold;
-      border: none;
-    }
-    button:hover {
-      background: #66fcf1;
+      cursor: pointer;
     }
     pre {
-      background: #0b0c10;
-      padding: 10px;
+      background: #1f2833;
+      padding: 15px;
       border-radius: 6px;
       white-space: pre-wrap;
-      word-wrap: break-word;
-      border: 1px solid #45a29e;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Cliente Groq (Chat)</h2>
 
-    <!-- Barra para ingresar el API key -->
-    <label for="apiKey">API Key de Groq</label>
-    <input type="password" id="apiKey" placeholder="Pega aquí tu API key" />
+  <h2>Cliente Groq (compatible con GitHub Pages)</h2>
 
-    <!-- Prompt -->
-    <label for="prompt">Mensaje para el modelo</label>
-    <textarea id="prompt" rows="4" placeholder="Escribe tu pregunta o mensaje..."></textarea>
+  <label>API Key de Groq</label>
+  <input type="password" id="apiKey" placeholder="Pega tu API key aquí">
 
-    <button id="sendBtn">Enviar a Groq</button>
+  <label>URL del Proxy (Webhook.site)</label>
+  <input type="text" id="proxyUrl" placeholder="Pega aquí tu URL de Webhook.site">
 
-    <h3>Respuesta</h3>
-    <pre id="response">Aquí aparecerá la respuesta del modelo...</pre>
-  </div>
+  <label>Mensaje</label>
+  <textarea id="prompt" rows="4" placeholder="Escribe tu mensaje..."></textarea>
 
-  <script>
-    const sendBtn = document.getElementById("sendBtn");
-    const apiKeyInput = document.getElementById("apiKey");
-    const promptInput = document.getElementById("prompt");
-    const responseBox = document.getElementById("response");
+  <button id="sendBtn">Enviar</button>
 
-    sendBtn.addEventListener("click", async () => {
-      const apiKey = apiKeyInput.value.trim();
-      const prompt = promptInput.value.trim();
+  <h3>Respuesta</h3>
+  <pre id="response">Esperando mensaje...</pre>
 
-      if (!apiKey) {
-        alert("Por favor, ingresa tu API key de Groq.");
-        return;
-      }
-      if (!prompt) {
-        alert("Escribe un mensaje para el modelo.");
-        return;
-      }
+<script>
+document.getElementById("sendBtn").addEventListener("click", async () => {
+  const apiKey = document.getElementById("apiKey").value.trim();
+  const proxyUrl = document.getElementById("proxyUrl").value.trim();
+  const prompt = document.getElementById("prompt").value.trim();
+  const responseBox = document.getElementById("response");
 
-      responseBox.textContent = "Consultando a Groq...";
+  if (!apiKey || !proxyUrl || !prompt) {
+    alert("Falta algún dato: API key, proxy o mensaje.");
+    return;
+  }
 
-      try {
-        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({
-            model: "groq/compound", // Cambia el modelo si quieres otro
-            messages: [
-              { role: "user", content: prompt }
-            ]
-          })
-        });
+  responseBox.textContent = "Consultando a Groq...";
 
-        if (!res.ok) {
-          const errorText = await res.text();
-          responseBox.textContent = `Error: ${res.status}\n${errorText}`;
-          return;
-        }
+  const payload = {
+    url: "https://api.groq.com/openai/v1/chat/completions",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + apiKey
+    },
+    body: {
+      model: "groq/compound",
+      messages: [{ role: "user", content: prompt }]
+    }
+  };
 
-        const data = await res.json();
-        const content = data.choices?.[0]?.message?.content || "Sin contenido recibido.";
-        responseBox.textContent = content;
-      } catch (err) {
-        responseBox.textContent = "Error al llamar a la API:\n" + err;
-      }
+  try {
+    const res = await fetch(proxyUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     });
-  </script>
+
+    const data = await res.json();
+    const content = data?.choices?.[0]?.message?.content || "Sin contenido.";
+    responseBox.textContent = content;
+
+  } catch (err) {
+    responseBox.textContent = "Error: " + err;
+  }
+});
+</script>
+
 </body>
 </html>
